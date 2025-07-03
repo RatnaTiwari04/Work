@@ -1,0 +1,258 @@
+@use '../../styles/Colors' as *;
+@use 'sass:color';
+
+
+.text-input-container {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  margin-bottom: 1.5rem;
+
+  &.label-middle .floating-label,
+  &.label-middle .middle-label,
+  &.label-internal .floating-label {
+    position: absolute;
+    left: 12px;
+    top: 10px;
+    font-size: 14px;
+    color: $label-color;
+    background: $white;
+    padding: 0 4px;
+    transition: all 0.2s ease;
+    pointer-events: none;
+
+    &.float {
+      top: -8px;
+      font-size: 12px;
+      color: $primary-color;
+    }
+  }
+
+  &.label-middle .middle-label {
+    position: absolute;
+    left: 12px;
+    top: -8px;
+    font-size: 12px;
+    color: $label-color;
+    background: $white;
+    padding: 0 4px;
+    pointer-events: none;
+    z-index: 1;
+
+    &.focused {
+      color: $primary-color;
+    }
+  }
+
+  .text-input,
+  textarea {
+    padding: 0px 12px 0px 12px;
+    border-radius: 2px;
+    border: 1.5px solid #ccc;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    font-size: 14px;
+    width: 100%;
+    background: #fff;
+    color: #333;
+    font-family: inherit;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    line-height: 40px;
+
+    &::placeholder {
+      color: $disabled-color;
+      opacity: 0.7;
+    }
+
+    &:focus {
+      outline: none;
+      border-width: 0cm;
+      border-color: $primary-color;
+      box-shadow: 0 0 0 3px rgba(90, 79, 255, 0.1);
+    }
+
+    &:focus-visible {
+      outline: 2px solid $primary-color;
+      outline-offset: 2px;
+      border-width: 0cm;
+    }
+
+    &.focused {
+      border-color: $primary-color;
+      box-shadow: 0 0 0 3px rgba(90, 79, 255, 0.1);
+      border-width: 0cm;
+    }
+
+    &.error {
+      border-color: $error-color;
+      
+      &:focus {
+        box-shadow: 0 0 0 3px rgba(255, 77, 79, 0.1);
+      }
+    }
+
+    &.warning {
+      border-color: $warning-color;
+      
+      &:focus {
+        box-shadow: 0 0 0 3px rgba(250, 173, 20, 0.1);
+      }
+    }
+
+    &.info {
+      border-color: $info-color;
+      
+      &:focus {
+        box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.1);
+      }
+    }
+
+    &.success {
+      border-color: $success-color;
+      
+      &:focus {
+        box-shadow: 0 0 0 3px rgba(82, 196, 26, 0.1);
+      }
+    }
+
+    &.disabled,
+    &:disabled {
+      background: $background-disabled;
+      color: $disabled-color;
+      border-color: color.adjust($border-color, $lightness: 10%);
+      cursor: not-allowed;
+      
+      &::placeholder {
+        color: color.adjust($disabled-color, $lightness: 20%);
+      }
+    }
+
+    &:hover:not(:disabled):not(.disabled) {
+      border-color: color.adjust($border-color, $lightness: -10%);
+    }
+  }
+
+  .text-input-label {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: $text-color;
+    display: block;
+
+    .required {
+      color: $error-color;
+      margin-left: 4px;
+    }
+  }
+
+  .message {
+    font-size: 12px;
+    margin-top: 4px;
+    line-height: 1.4;
+
+    &.error {
+      color: $error-color;
+    }
+
+    &.warning {
+      color: $warning-color;
+    }
+
+    &.info {
+      color: $info-color;
+    }
+
+    &.success {
+      color: $success-color;
+    }
+  }
+
+  .input-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $disabled-color;
+    pointer-events: none;
+    transition: color 0.2s ease;
+
+    .text-input:focus ~ &,
+    .text-input.focused ~ & {
+      color: $primary-color;
+    }
+
+    .text-input.error ~ & {
+      color: $error-color;
+    }
+
+    .text-input.warning ~ & {
+      color: $warning-color;
+    }
+
+    .text-input.info ~ & {
+      color: $info-color;
+    }
+
+    .text-input.success ~ & {
+      color: $success-color;
+    }
+  }
+
+  &.has-icon {
+    .text-input,
+    textarea {
+      padding-right: 40px;
+    }
+
+    .input-icon {
+      right: 12px;
+    }
+    .input-icon svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+.form-showcase {
+  width: 100%;
+  max-width: 350px;
+  margin: 0 auto;
+  padding: 1rem 30rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+ 
+  h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: $text-color;
+    font-weight: 600;
+  }
+
+  .form-group {
+    margin-bottom: 2rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  label {
+    font-weight: 500;
+    display: block;
+    margin-bottom: 0.5rem;
+    color: $text-color;
+  }
+
+  .required {
+    color: $error-color;
+    margin-left: 4px;
+  }
+
+  // Responsive adjustments
+  @media (max-width: 768px) {
+    max-width: 100%;
+    padding: 1rem;
+    margin: 0 1rem;
+  }
+}
