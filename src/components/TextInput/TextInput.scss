@@ -1,0 +1,376 @@
+@use '../../styles/Colors' as *;
+@use 'sass:color';
+
+
+.text-input-container {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  margin-bottom: 1.5rem;
+  margin-top: 1.5rem;
+
+  &.label-middle .floating-label,
+  &.label-middle .middle-label,
+  &.label-internal .floating-label {
+    position: absolute;
+    left: 12px;
+    top: 10px;
+    font-size: 13px;
+    color: $label-color;
+    background: $white;
+    padding: 0 4px;
+    transition: all 0.2s ease;
+    pointer-events: none;
+    z-index: 2; 
+
+    &.float {
+      top: -8px;
+      font-size: 12px;
+      color: $primary-color;
+      z-index: 2; 
+    }
+  }
+
+  &.label-middle .middle-label {
+    position: absolute;
+    left: 12px;
+    top: -8px;
+    font-size: 12px;
+    color: $label-color;
+    background: $white;
+    padding: 0 4px;
+    pointer-events: none;
+    z-index: 2; 
+
+    &.focused {
+      color: $primary-color;
+    }
+  }
+
+  .input-field-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .text-input,
+  textarea {
+    padding: 0px 12px 0px 12px;
+    border-radius: 2px;
+    border: 1.5px solid #ccc;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    font-size: 14px;
+    width: 100%;
+    background: #fff;
+    color: #333;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    line-height: 40px;
+
+    &.has-error-icon {
+      padding-right: 40px;
+    }
+
+    &::placeholder {
+      color: $disabled-color;
+      opacity: 0.7;
+    }
+
+    &:focus {
+      outline: none;
+      border-width: 0cm;
+      border-color: $primary-color;
+      box-shadow: 0 0 0 3px rgba(90, 79, 255, 0.05);
+    }
+
+    &:focus-visible {
+      outline: 2px solid $primary-color;
+      outline-offset: 2px;
+      border-width: 0cm;
+    }
+
+    &.focused {
+      border-color: $primary-color;
+      box-shadow: 0 0 0 3px rgba(90, 79, 255, 0.05);
+      border-width: 0cm;
+    }
+
+    &.error {
+      border-color: $error-color;
+      
+      &:focus {
+        box-shadow: 0 0 0 3px rgba(255, 77, 79, 0.1);
+      }
+    }
+
+    &.warning {
+      border-color: $warning-color;
+      
+      &:focus {
+        box-shadow: 0 0 0 3px rgba(250, 173, 20, 0.1);
+      }
+    }
+
+    &.info {
+      border-color: $info-color;
+      
+      &:focus {
+        box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.1);
+      }
+    }
+
+    &.success {
+      border-color: $success-color;
+      
+      &:focus {
+        box-shadow: 0 0 0 3px rgba(82, 196, 26, 0.1);
+      }
+    }
+
+    &.disabled,
+    &:disabled {
+      background: $background-disabled;
+      color: $disabled-color;
+      border-color: color.adjust($border-color, $lightness: 10%);
+      cursor: not-allowed;
+      
+      &::placeholder {
+        color: color.adjust($disabled-color, $lightness: 20%);
+      }
+    }
+
+    &:hover:not(:disabled):not(.disabled) {
+      border-color: color.adjust($border-color, $lightness: -10%);
+    }
+  }
+
+  .text-input-label {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: $text-color;
+    display: block;
+
+    .required {
+      color: $error-color;
+      margin-left: 4px;
+    }
+  }
+
+  .message {
+    font-size: 12px;
+    margin-top: 4px;
+    line-height: 1.4;
+
+    &.error {
+      color: $error-color;
+    }
+
+    &.warning {
+      color: $warning-color;
+    }
+
+    &.info {
+      color: $info-color;
+    }
+
+    &.success {
+      color: $success-color;
+    }
+  }
+
+  .text-input__error-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $error-color;
+    pointer-events: none;
+    z-index: 1;
+    
+    svg {
+      display: block;
+      width: 16px;
+      height: 16px;
+    }
+  }
+  textarea{
+    line-height: 25px !important;
+  }
+
+  textarea.has-error-icon ~ .text-input__error-icon {
+    top: 16px;
+    transform: none;
+  }
+
+  .input-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $disabled-color;
+    pointer-events: none;
+    transition: color 0.2s ease;
+
+    .text-input:focus ~ &,
+    .text-input.focused ~ & {
+      color: $primary-color;
+    }
+
+    .text-input.error ~ & {
+      color: $error-color;
+    }
+
+    .text-input.warning ~ & {
+      color: $warning-color;
+    }
+
+    .text-input.info ~ & {
+      color: $info-color;
+    }
+
+    .text-input.success ~ & {
+      color: $success-color;
+    }
+  }
+
+  &.has-icon {
+    .text-input,
+    textarea {
+      padding-right: 40px;
+    }
+
+    .input-icon {
+      right: 12px;
+    }
+    .input-icon svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+.bottom-border-only {
+  .text-input,
+  textarea {
+    border: none !important;
+    border-bottom: 2px solid $border-color !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+
+    &:focus,
+    &:focus-visible {
+      border-bottom-color: $primary-color !important;
+      outline: none !important;
+    }
+
+    &.error {
+      border-bottom-color: $error-color !important;
+    }
+  }
+  textarea{
+    
+ &::placeholder {
+      transform: translateY(70px) !important; 
+    }   
+  }
+}
+
+
+
+.form-showcase {
+  width: 100%;
+  max-width: 350px;
+  margin: 0 auto;
+  padding: 1rem 40rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+ 
+  h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: $text-color;
+    font-weight: 600;
+  }
+
+  .form-group {
+    margin-bottom: 2rem;
+    h3{
+          font-size: 14px;
+    font-weight: 600;
+    color: #777;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  label {
+    font-weight: 500;
+    display: block;
+    margin-bottom: 0.5rem;
+    color: $text-color;
+  }
+
+  .required {
+    color: $error-color;
+    margin-left: 4px;
+  }
+
+  // Responsive adjustments
+  @media (max-width: 768px) {
+    max-width: 100%;
+    padding: 1rem;
+    margin: 0 1rem;
+  }
+}
+
+
+.bottom-border-only {
+  width: 100%;
+  max-width: 350px;
+  margin: 0 auto;
+  padding: 1rem 40rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+ 
+  h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: $text-color;
+    font-weight: 600;
+  }
+
+  .form-group {
+    margin-bottom: 2rem;
+    h3{
+          font-size: 14px;
+    font-weight: 600;
+    color: #777;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  label {
+    font-weight: 500;
+    display: block;
+    margin-bottom: 0.5rem;
+    color: $text-color;
+  }
+
+  .required {
+    color: $error-color;
+    margin-left: 4px;
+  }
+
+  // Responsive adjustments
+  @media (max-width: 768px) {
+    max-width: 100%;
+    padding: 1rem;
+    margin: 0 1rem;
+  }
+}
