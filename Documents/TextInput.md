@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Component Overview :
 
 This is a fully customizable and reusable React + TypeScript component used for input fields across a UI, supporting:
@@ -99,4 +100,3 @@ Displays error icon next to the input when variant === "error".
     {message}
   </div>
 )}
-Shows message (error, info, etc.) only if input is touched and a variant is set.

@@ -1,4 +1,4 @@
-import React, { useState, FocusEvent } from "react";
+import React, { useState,FocusEvent } from "react";
 import "./TextInput.scss";
 
 type Variant = "error" | "warning" | "info" | "success" | "";

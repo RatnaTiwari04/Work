@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import TextInput from "../components/TextInput";
 
 const ShowcaseForm = () => {
@@ -9,6 +10,7 @@ const ShowcaseForm = () => {
   const [defaultValue, setDefaultValue] = useState("");
   const [error, setError] = useState("");
   const focusedInputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -102,6 +104,11 @@ const ShowcaseForm = () => {
           onChange={setActivated}
           MAX_INPUT_LENGTH={200}
         />
+      </div>
+      <div >
+        <button onClick={() => navigate("/Example2")} className="btn">
+          Go to Example 2
+        </button>
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import TextInput from "../components/TextInput";
+import { useNavigate } from "react-router-dom";
 
 const ShowcaseForm = () => {
   const [internal, setinternal] = useState("");
@@ -8,6 +9,7 @@ const ShowcaseForm = () => {
   const [defaultValue, setDefaultValue] = useState("");
   const [error, setError] = useState("");
   const focusedInputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -20,7 +22,7 @@ const ShowcaseForm = () => {
 
   return (
     <div className="bottom-border-only">
-      <h2>TextInput Example Form</h2>
+      <h2>TextInput Bottom Border</h2>
 
       <div className="form-group">
         <h3>Default</h3>
@@ -88,6 +90,11 @@ const ShowcaseForm = () => {
           message="This field is required"
           labelPosition="internal"
         />
+      </div>
+      <div >
+        <button onClick={() => navigate("/Example4")} className="btn">
+          Go to Example 4
+        </button>
       </div>
     </div>
   );
