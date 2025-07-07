@@ -327,6 +327,15 @@
   }
 }
 
+.form-row {
+  display: flex;
+  gap: 1rem;
+
+  > * {
+    flex: 1;
+  }
+}
+
 
 .bottom-border-only {
   width: 100%;
