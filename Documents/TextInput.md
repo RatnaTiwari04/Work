@@ -1,49 +1,62 @@
-<<<<<<< HEAD
-Component Overview :
+Component Overview:
 
-This is a fully customizable and reusable React + TypeScript component used for input fields across a UI, supporting:
-Single-line and multi-line inputs
-Internal, external, or middle-aligned floating labels
-Optional validation states with messages (error, warning, etc.)
-Max character length enforcement
-Disabled and required states
+This is a fully customizable and reusable **React + TypeScript** input component supporting:
+- Single-line and multi-line inputs
+- Internal, external, or middle-aligned floating labels
+- Optional validation states with messages (error, warning, etc.)
+- Max character length enforcement
+- Disabled, read-only, and required states
 
-Components location :
+**Component Location:**
+```
 /components/TextInput.tsx
+```
 
+---
+
+### Props Table:
 
 | Prop Name          | Type                                                | Description                                         |
-| ------------------ | --------------------------------------------------- | --------------------------------------------------- |
+|--------------------|-----------------------------------------------------|-----------------------------------------------------|
 | `label`            | `string`                                            | Text label for the input                            |
-| `labelPosition`    | `"internal" \| "external" \| "middle"`              | Position of the label                               |
+| `labelPosition`    | `"internal" | "external" | "middle"`                | Position of the label                               |
 | `placeholder`      | `string`                                            | Placeholder text (ignored if internal/middle label) |
 | `required`         | `boolean`                                           | Marks the field as required                         |
 | `disabled`         | `boolean`                                           | Disables input field                                |
+| `readOnly`         | `boolean`                                           | Renders the input as read-only                      |
 | `value`            | `string`                                            | Current value of the input (controlled input)       |
 | `onChange`         | `(value: string) => void`                           | Callback on value change                            |
 | `message`          | `string`                                            | Optional helper or error message                    |
-| `variant`          | `"error" \| "warning" \| "info" \| "success" \| ""` | Visual state                                        |
+| `variant`          | `"error" | "warning" | "info" | "success" | ""`     | Visual state of the field                           |
 | `name`             | `string`                                            | HTML name and id for accessibility                  |
 | `className`        | `string`                                            | Optional class for styling overrides                |
 | `MAX_INPUT_LENGTH` | `number`                                            | Limits character input                              |
 | `multiline`        | `boolean`                                           | Renders `<textarea>` instead of `<input>`           |
 | `rows`             | `number`                                            | Number of rows for multiline textareas              |
 
+---
 
-Component Logic Explained :
+### Component Logic:
 
+```ts
 const [focused, setFocused] = useState(false);
 const [touched, setTouched] = useState(false);
-focused: Tracks whether the input is currently focused.
-touched: Tracks whether the input has been interacted with, to conditionally show validation messages.
+```
+- `focused`: Tracks whether the input is currently focused.
+- `touched`: Tracks if the user has interacted with the field (used to trigger validation messages).
 
-Focus and Blur Handlers :
+#### Focus and Blur Handlers:
+```ts
 const handleFocus = () => setFocused(true);
-const handleBlur = (e) => { setFocused(false); setTouched(true); }
-Sets focus and marks the field as touched when it loses focus.
+const handleBlur = (e) => {
+  setFocused(false);
+  setTouched(true);
+};
+```
+- Activates label styling and triggers validation message rendering on blur.
 
-Change Handler with Max Length Check:
-
+#### Input Change Handler:
+```ts
 const handleChange = (e) => {
   const newValue = e.target.value;
   if (newValue.length > MAX_INPUT_LENGTH) {
@@ -51,52 +64,59 @@ const handleChange = (e) => {
     return;
   }
   onChange?.(newValue);
-}
+};
+```
+- Limits input length and triggers the parent `onChange`.
 
-Enforces character limit and calls parent onChange only if within bounds.
+---
 
-Structure Breakdown :
+### Structure Overview:
 
+#### Container:
+```tsx
 <div className={containerClass}>
-Outer container class varies based on labelPosition and variant.
+```
+- Contains all elements. Dynamic class names depend on `labelPosition` and `variant`.
 
-Label (External) :
-{label && labelPosition === "external" && (
-  <h3>{label}</label>
-)}
-Shown above the input box.
+#### Labels:
+```tsx
+{label && labelPosition === "external" && <label>...}
+{label && labelPosition === "internal" && <label className={...}>...}
+{label && labelPosition === "middle" && <label className={...}>...}
+```
+- External: Above the input.
+- Internal: Floats inside the input.
+- Middle: Centered inside until focused.
 
-Floating Label (Internal or Middle) :
-{label && labelPosition === "internal" && (
-  <label className={focused || value ? "float" : ""}>{label}</label>
-)}
-Appears inside the input and floats on focus or when there's content.
-
-{label && labelPosition === "middle" && (
-  <label className={focused ? "focused" : ""}>{label}</label>
-)}
-Appears halfway inside the input, good for aesthetic purposes.
-
-Input or Textarea Field
+#### Input Field:
+```tsx
 {multiline ? (
   <textarea ... />
 ) : (
   <input type="text" ... />
 )}
-Supports both types using the multiline prop.
+```
+- Supports `input` or `textarea` based on `multiline` prop.
+- Adds props like `required`, `disabled`, `readOnly`, `rows`, etc.
 
-Placeholder is conditionally shown based on label position.
-
-Validation Message and Icon
+#### Validation Icon:
+```tsx
 {variant === 'error' && (
-  <div className="text-input__error-icon">
-    <!-- SVG Icon -->
-  </div>
+  <div className="text-input__error-icon">...</div>
 )}
-Displays error icon next to the input when variant === "error".
+```
+- Shows an SVG error icon when validation fails.
 
+#### Message:
+```tsx
 {showMessage && (
-  <div className={`message ${variant}`}>
-    {message}
-  </div>
+  <div className={`message ${variant}`}>{message}</div>
 )}
+```
+- Displays contextual error/info/success/warning messages after interaction.
+
+---
+
+### Accessibility Notes:
+- `htmlFor={name}` binds the label to the input/textarea for better screen reader support.
+- `readOnly` does not allow editing but still lets users select/copy the content.
