@@ -67,6 +67,7 @@
     display: flex;
     align-items: center;
     line-height: 40px;
+    resize: none;
 
     &.has-error-icon {
       padding-right: 40px;

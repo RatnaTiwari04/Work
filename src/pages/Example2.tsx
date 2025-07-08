@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import TextInput from "../components/TextInput";
+import TextInput from "../components/TextInput/TextInput";
 
 function Example2() {
   const [firstName, setFirstName] = useState("");

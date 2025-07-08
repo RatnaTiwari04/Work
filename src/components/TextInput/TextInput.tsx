@@ -19,7 +19,6 @@ interface TextInputProps {
   MAX_INPUT_LENGTH?: number;
   multiline?: boolean;
   rows?: number;
-  resize?: "none" | "both" | "horizontal" | "vertical";
   readOnly?:boolean;
 }
 
@@ -38,7 +37,6 @@ const TextInput: React.FC<TextInputProps> = ({
   MAX_INPUT_LENGTH = 20,
   multiline = false,
   rows = 4,
-  resize = "none",
   readOnly=false,
 }) => {
   const [focused, setFocused] = useState(false);
@@ -129,7 +127,6 @@ const TextInput: React.FC<TextInputProps> = ({
             required={required}
             disabled={disabled}
             rows={rows}
-            style={{ resize: resize }}
             readOnly={readOnly}
           />
         ) : (

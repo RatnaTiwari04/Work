@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import TextInput from "../components/TextInput";
+import TextInput from "../components/TextInput/TextInput";
 import { useNavigate } from "react-router-dom";
 
 const ShowcaseForm = () => {

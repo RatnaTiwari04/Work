@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import TextInput from "../components/TextInput";
+import TextInput from "../components/TextInput/TextInput";
 
 const ShowcaseForm = () => {
   const [internal, setinternal] = useState("");
