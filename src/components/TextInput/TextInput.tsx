@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, FocusEvent } from "react";
 import "./TextInput.scss";
 
 type Variant = "error" | "warning" | "info" | "success" | "";
@@ -19,7 +19,8 @@ interface TextInputProps {
   MAX_INPUT_LENGTH?: number;
   multiline?: boolean;
   rows?: number;
-  readOnly?:boolean;
+  readOnly?: boolean;
+  multiEntry?: boolean;
 }
 
 const TextInput: React.FC<TextInputProps> = ({
@@ -37,10 +38,17 @@ const TextInput: React.FC<TextInputProps> = ({
   MAX_INPUT_LENGTH = 20,
   multiline = false,
   rows = 4,
-  readOnly=false,
+  readOnly = false,
+  multiEntry = false,
 }) => {
   const [focused, setFocused] = useState(false);
   const [touched, setTouched] = useState(false);
+  const [inputValue, setInputValue] = useState(value);
+  const [chips, setChips] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (!multiEntry) setInputValue(value);
+  }, [value, multiEntry]);
 
   const showMessage = touched && variant && message;
 
@@ -51,37 +59,54 @@ const TextInput: React.FC<TextInputProps> = ({
     setTouched(true);
   };
 
+  const handleChipRemove = (index: number) => {
+    const updatedChips = chips.filter((_, i) => i !== index);
+    setChips(updatedChips);
+    onChange?.(updatedChips.join(", "));
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const newValue = e.target.value;
-    if (newValue.length > MAX_INPUT_LENGTH) {
-      console.warn(`TextInput: Max length of ${MAX_INPUT_LENGTH} exceeded.`);
-      return;
+    if (multiEntry) {
+      setInputValue(newValue);
+      if (newValue.endsWith(", ")) {
+        const trimmed = newValue.replace(/,\s*$/, "").trim();
+        if (trimmed && !chips.includes(trimmed)) {
+          const updatedChips = [...chips, trimmed];
+          setChips(updatedChips);
+          setInputValue("");
+          onChange?.(updatedChips.join(", "));
+        }
+      }
+    } else {
+      if (newValue.length > MAX_INPUT_LENGTH) {
+        console.warn(`TextInput: Max length of ${MAX_INPUT_LENGTH} exceeded.`);
+        return;
+      }
+      setInputValue(newValue);
+      onChange?.(newValue);
     }
-    console.log("Input changed:", e.target.value);
-    onChange?.(newValue);
   };
 
   const getInputState = () => {
-    if (disabled) return 'disabled';
-    if (variant === 'error') return 'error';
-    if (focused) return 'focused';
-    if (value) return 'activated';
-    return 'default';
+    if (disabled) return "disabled";
+    if (variant === "error") return "error";
+    if (focused) return "focused";
+    if (inputValue) return "activated";
+    return "default";
   };
 
   const inputState = getInputState();
 
-  const inputClass = [
-    "text-input",
-    inputState,
-    className,
-  ].join(" ");
+  const inputClass = ["text-input", inputState, className].join(" ");
 
   const containerClass = [
     "text-input-container",
-    labelPosition ? `label-${labelPosition}` : "", 
+    labelPosition ? `label-${labelPosition}` : "",
     variant,
-  ].filter(Boolean).join(" ");
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <div className={containerClass}>
@@ -91,12 +116,12 @@ const TextInput: React.FC<TextInputProps> = ({
           {required && <span className="required">*</span>}
         </label>
       )}
-      
+
       <div className="input-wrapper">
         {label && labelPosition === "internal" && (
           <label
             htmlFor={name}
-            className={`floating-label ${focused || value ? "float" : ""}`}
+            className={`floating-label ${focused || inputValue ? "float" : ""}`}
           >
             {label}
             {required && <span className="required">*</span>}
@@ -112,56 +137,78 @@ const TextInput: React.FC<TextInputProps> = ({
             {required && <span className="required">*</span>}
           </label>
         )}
-        
+
         <div className="input-field-wrapper">
-        {multiline ? (
-          <textarea
-            id={name}
-            name={name}
-            className={inputClass}
-            value={value}
-            placeholder={labelPosition === "internal" || labelPosition === "middle" ? "" : placeholder}
-            onChange={handleChange}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            required={required}
-            disabled={disabled}
-            rows={rows}
-            readOnly={readOnly}
-          />
-        ) : (
-          <input
-            type="text"
-            id={name}
-            name={name}
-            className={inputClass}
-            value={value}
-            placeholder={labelPosition === "internal" || labelPosition === "middle" ? "" : placeholder}
-            onChange={handleChange}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            required={required}
-            disabled={disabled}
-            readOnly={readOnly}
-          />
-        )}
-        
-        {variant === 'error' && (
-          <div className="text-input__error-icon">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1"/>
-              <path d="M8 4v4M8 10h0" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/>
-            </svg>
-          </div>
-        )}
+          {multiline ? (
+            <textarea
+              id={name}
+              name={name}
+              className={inputClass}
+              value={inputValue}
+              placeholder={
+                labelPosition === "internal" || labelPosition === "middle"
+                  ? ""
+                  : placeholder
+              }
+              onChange={handleChange}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              required={required}
+              disabled={disabled}
+              rows={rows}
+              readOnly={readOnly}
+            />
+          ) : (
+            <input
+              type="text"
+              id={name}
+              name={name}
+              className={inputClass}
+              value={inputValue}
+              placeholder={
+                labelPosition === "internal" || labelPosition === "middle"
+                  ? ""
+                  : placeholder
+              }
+              onChange={handleChange}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              required={required}
+              disabled={disabled}
+              readOnly={readOnly}
+            />
+          )}
+
+          {variant === "error" && (
+            <div className="text-input__error-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1" />
+                <path
+                  d="M8 4v4M8 10h0"
+                  stroke="currentColor"
+                  strokeWidth="1"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </div>
+          )}
         </div>
       </div>
-      
-      {showMessage && (
-        <div className={`message ${variant}`}>
-          {message}
+
+      {multiEntry && chips.length > 0 && (
+        <div className="chip-container">
+          {chips.map((chip, index) => (
+            <div className="chip" key={index}>
+              {chip}
+              <button type="button" onClick={() => handleChipRemove(index)}>
+                &times;
+              </button>
+            </div>
+          ))}
         </div>
       )}
+
+      {showMessage && <div className={`message ${variant}`}>{message}</div>}
     </div>
   );
 };

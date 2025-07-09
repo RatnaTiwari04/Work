@@ -5,6 +5,7 @@ import TextInput from "../components/TextInput/TextInput";
 const ShowcaseForm = () => {
   const [internal, setinternal] = useState("");
   const [external, setExternal] = useState("");
+  const [chipinternal, setChipInternal] = useState("");
   const [activated, setActivated] = useState("");
   const [middle, setMiddle] = useState("");
   const [defaultValue, setDefaultValue] = useState("");
@@ -61,6 +62,19 @@ const ShowcaseForm = () => {
           onChange={setExternal}
           placeholder="hii write here something for placeholder sushant sir"
           labelPosition="external"
+          multiEntry
+        />
+      </div>
+
+      <div className="form-group">
+        <h3>Multientry </h3>
+        <TextInput
+          label="Label"
+          value={chipinternal}
+          onChange={setChipInternal}
+          placeholder="use comma and space to create chips"
+          labelPosition="internal"
+          multiEntry
         />
       </div>
 
