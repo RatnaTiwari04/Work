@@ -35,7 +35,7 @@ This is a fully customizable and reusable **React + TypeScript** input component
 | `rows`             | `number`                                            | Number of rows for multiline textareas              |
 | `multientry`       | `boolean`                                           | Enables chips-based multi-entry mode                |
 |`showCharacterCount`| `boolean`                                           | Checks For no of Characters used                    |
-| 'infotip`          | `string`                                            | To display the message as info                      | 
+| `infotip`          | `string`                                            | To display the message as info                      | 
 ---
 
 ### Component Logic:
