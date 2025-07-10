@@ -19,7 +19,7 @@ This is a fully customizable and reusable **React + TypeScript** input component
 | Prop Name          | Type                                                | Description                                         |
 |--------------------|-----------------------------------------------------|-----------------------------------------------------|
 | `label`            | `string`                                            | Text label for the input                            |
-| `labelPosition`    | `"internal" | "external" | "middle"`                | Position of the label                               |
+| `labelPosition`    | `"internal" \| "external" \| "middle"`              | Position of the label                               |
 | `placeholder`      | `string`                                            | Placeholder text (ignored if internal/middle label) |
 | `required`         | `boolean`                                           | Marks the field as required                         |
 | `disabled`         | `boolean`                                           | Disables input field                                |
@@ -27,7 +27,7 @@ This is a fully customizable and reusable **React + TypeScript** input component
 | `value`            | `string`                                            | Current value of the input (controlled input)       |
 | `onChange`         | `(value: string) => void`                           | Callback on value change                            |
 | `message`          | `string`                                            | Optional helper or error message                    |
-| `variant`          | `"error" | "warning" | "info" | "success" | ""`     | Visual state of the field                           |
+| `variant`          | `"error" \| "warning" \| "info" \| "success" \| ""` | Visual state of the field                           |
 | `name`             | `string`                                            | HTML name and id for accessibility                  |
 | `className`        | `string`                                            | Optional class for styling overrides                |
 | `MAX_INPUT_LENGTH` | `number`                                            | Limits character input                              |
@@ -35,7 +35,7 @@ This is a fully customizable and reusable **React + TypeScript** input component
 | `rows`             | `number`                                            | Number of rows for multiline textareas              |
 | `multientry`       | `boolean`                                           | Enables chips-based multi-entry mode                |
 |`showCharacterCount`| `boolean`                                           | Checks For no of Characters used                    |
-| 'infotip`          | 'string`                                            | To display the message as info                      | 
+| 'infotip`          | `string`                                            | To display the message as info                      | 
 ---
 
 ### Component Logic:
