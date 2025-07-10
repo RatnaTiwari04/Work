@@ -1,7 +1,6 @@
 @use '../../styles/Colors' as *;
 @use 'sass:color';
 
-
 .text-input-container {
   display: flex;
   flex-direction: column;
@@ -21,7 +20,7 @@
     padding: 0 4px;
     transition: all 0.2s ease;
     pointer-events: none;
-    z-index: 2; 
+    z-index: 3; //changed here
 
     &.float {
       top: -8px;
@@ -159,6 +158,84 @@
     }
   }
 
+  //added this from here
+  .info-icon {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 6px;
+    cursor: pointer;
+    color: $disabled-color;
+    vertical-align: middle;
+    transition: color 0.2s ease;
+    position: relative;
+    z-index: 15; // Higher z-index to ensure it's above labels
+    pointer-events: auto; // Ensure it receives pointer events
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    &:hover {
+      color: $primary-color;
+      
+      .tooltip {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(-2px);
+      }
+    }
+
+    .tooltip {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(0);
+      background: white;
+      color: black;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s ease;
+      z-index: 1000;
+      pointer-events: none;
+      margin-bottom: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      border: 1px solid #e0e0e0;
+
+      &::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 5px solid transparent;
+        border-top-color: white;
+      }
+    }
+  }
+
+  // Special positioning for floating and middle labels
+  &.label-internal .info-icon,
+  &.label-middle .info-icon {
+    .tooltip {
+      bottom: auto;
+      top: 100%;
+      margin-top: 8px;
+      margin-bottom: 0;
+
+      &::after {
+        top: auto;
+        bottom: 100%;
+        border-top-color: transparent;
+        border-bottom-color: white;
+      }
+    }
+  }
+
   .message {
     font-size: 12px;
     margin-top: 4px;
@@ -196,7 +273,8 @@
       height: 16px;
     }
   }
-  textarea{
+
+  textarea {
     line-height: 25px !important;
   }
 
@@ -245,46 +323,48 @@
     .input-icon {
       right: 12px;
     }
+    
     .input-icon svg {
       width: 20px;
       height: 20px;
     }
   }
+
   .chip-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 3px;
-  margin-top: 8px;
-  justify-content: flex-start;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+    margin-top: 8px;
+    justify-content: flex-start;
 
-  .chip {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 3px 8px;
-    font-size: 12px;
-    background-color: #999;
-    color: white;
-    border-radius: 8px;
-    line-height: 1;
-    height: 20px;
-
-    button {
-      padding: 0;
-      margin-left: 6px;
-      background: none;
-      border: none;
-      color: white;
-      background-color: #999;
-      font-size: 14px;
-      cursor: pointer;
-      display: flex;
+    .chip {
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      outline: none;
+      padding: 3px 8px;
+      font-size: 12px;
+      background-color: #999;
+      color: white;
+      border-radius: 8px;
+      line-height: 1;
+      height: 20px;
+
+      button {
+        padding: 0;
+        margin-left: 6px;
+        background: none;
+        border: none;
+        color: white;
+        background-color: #999;
+        font-size: 14px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        outline: none;
+      }
     }
   }
-}
 }
 
 .bottom-border-only {
@@ -306,15 +386,38 @@
       border-bottom-color: $error-color !important;
     }
   }
-  textarea{
-    
- &::placeholder {
+  
+  textarea {
+    &::placeholder {
       transform: translateY(70px) !important; 
     }   
   }
+
+  .info-icon {
+    .tooltip {
+      background: white !important;
+      color: black !important;
+      white-space: nowrap !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+      border: 1px solid #e0e0e0 !important;
+
+      &::after {
+        border-top-color: white !important;
+      }
+    }
+  }
+
+  // Special positioning for floating and middle labels in bottom-border-only
+  &.label-internal .info-icon,
+  &.label-middle .info-icon {
+    .tooltip {
+      &::after {
+        border-top-color: transparent !important;
+        border-bottom-color: white !important;
+      }
+    }
+  }
 }
-
-
 
 .form-showcase {
   width: 100%;
@@ -332,10 +435,11 @@
 
   .form-group {
     margin-bottom: 2rem;
-    h3{
-          font-size: 14px;
-    font-weight: 600;
-    color: #777;
+    
+    h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #777;
     }
 
     &:last-child {
@@ -372,8 +476,7 @@
   }
 }
 
-
-.bottom-border-only {
+.bottom-border-only{
   width: 100%;
   max-width: 350px;
   margin: 0 auto;
@@ -389,10 +492,11 @@
 
   .form-group {
     margin-bottom: 2rem;
-    h3{
-          font-size: 14px;
-    font-weight: 600;
-    color: #777;
+    
+    h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #777;
     }
 
     &:last-child {

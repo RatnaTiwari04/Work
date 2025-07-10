@@ -51,6 +51,7 @@ const ShowcaseForm = () => {
           onChange={setinternal}
           placeholder="Place holder"
           labelPosition="internal"
+          infoTip="Hi this is internal label infotip"
         />
       </div>
 
@@ -63,6 +64,7 @@ const ShowcaseForm = () => {
           placeholder="hii write here something for placeholder sushant sir"
           labelPosition="external"
           multiEntry
+          infoTip="This is external label infotip"
         />
       </div>
 
@@ -86,6 +88,7 @@ const ShowcaseForm = () => {
           onChange={setMiddle}
           placeholder="Place holder"
           labelPosition="middle"
+          infoTip="This is middle label infotip"
         />
       </div>
 

@@ -60,6 +60,7 @@ const ShowcaseForm = () => {
           onChange={setExternal}
           placeholder="hii write here something for placeholder sushant sir"
           labelPosition="external"
+          infoTip="Hi this is external label infotip"
         />
       </div>
 

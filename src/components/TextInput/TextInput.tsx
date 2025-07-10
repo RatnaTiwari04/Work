@@ -1,4 +1,5 @@
 import React, { useState, useEffect, FocusEvent } from "react";
+import { Info } from "lucide-react"; 
 import "./TextInput.scss";
 
 type Variant = "error" | "warning" | "info" | "success" | "";
@@ -21,6 +22,7 @@ interface TextInputProps {
   rows?: number;
   readOnly?: boolean;
   multiEntry?: boolean;
+  infoTip?: string; 
 }
 
 const TextInput: React.FC<TextInputProps> = ({
@@ -40,6 +42,7 @@ const TextInput: React.FC<TextInputProps> = ({
   rows = 4,
   readOnly = false,
   multiEntry = false,
+  infoTip, 
 }) => {
   const [focused, setFocused] = useState(false);
   const [touched, setTouched] = useState(false);
@@ -108,12 +111,21 @@ const TextInput: React.FC<TextInputProps> = ({
     .filter(Boolean)
     .join(" ");
 
+  const renderInfoTip = () =>
+  infoTip && (
+    <span className="info-icon" aria-label="Info">
+      <Info size={16} strokeWidth={1.5} />
+      <div className="tooltip">{infoTip}</div>
+    </span>
+  );
+
   return (
     <div className={containerClass}>
       {label && labelPosition === "external" && (
         <label htmlFor={name} className="text-input-label">
           {label}
           {required && <span className="required">*</span>}
+          {renderInfoTip()}
         </label>
       )}
 
@@ -125,6 +137,7 @@ const TextInput: React.FC<TextInputProps> = ({
           >
             {label}
             {required && <span className="required">*</span>}
+            {renderInfoTip()}
           </label>
         )}
 
@@ -135,6 +148,7 @@ const TextInput: React.FC<TextInputProps> = ({
           >
             {label}
             {required && <span className="required">*</span>}
+            {renderInfoTip()}
           </label>
         )}
 
