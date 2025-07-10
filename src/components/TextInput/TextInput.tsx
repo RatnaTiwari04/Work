@@ -1,4 +1,4 @@
-import React, { useState, useEffect, FocusEvent } from "react";
+import React, { useState, useEffect } from "react";
 import { Info } from "lucide-react"; 
 import "./TextInput.scss";
 
@@ -22,7 +22,8 @@ interface TextInputProps {
   rows?: number;
   readOnly?: boolean;
   multiEntry?: boolean;
-  infoTip?: string; 
+  infoTip?: string;
+  showCharacterCount?: boolean; 
 }
 
 const TextInput: React.FC<TextInputProps> = ({
@@ -42,7 +43,8 @@ const TextInput: React.FC<TextInputProps> = ({
   rows = 4,
   readOnly = false,
   multiEntry = false,
-  infoTip, 
+  infoTip,
+  showCharacterCount = false, 
 }) => {
   const [focused, setFocused] = useState(false);
   const [touched, setTouched] = useState(false);
@@ -54,10 +56,13 @@ const TextInput: React.FC<TextInputProps> = ({
   }, [value, multiEntry]);
 
   const showMessage = touched && variant && message;
+  const currentLength = inputValue.length;
+  const isNearLimit = currentLength >= MAX_INPUT_LENGTH * 0.8;
+  const isAtLimit = currentLength >= MAX_INPUT_LENGTH;
 
   const handleFocus = () => setFocused(true);
 
-  const handleBlur = (e: FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleBlur = () => {
     setFocused(false);
     setTouched(true);
   };
@@ -119,6 +124,24 @@ const TextInput: React.FC<TextInputProps> = ({
     </span>
   );
 
+  const renderCharacterCount = () => {
+    if (!showCharacterCount || multiEntry) return null;
+    
+    const counterClass = [
+      "character-counter",
+      isAtLimit ? "at-limit" : "",
+      isNearLimit ? "near-limit" : "",
+    ]
+      .filter(Boolean)
+      .join(" ");
+
+    return (
+      <div className={counterClass}>
+        {currentLength}/{MAX_INPUT_LENGTH} chars used
+      </div>
+    );
+  };
+
   return (
     <div className={containerClass}>
       {label && labelPosition === "external" && (
@@ -171,6 +194,7 @@ const TextInput: React.FC<TextInputProps> = ({
               disabled={disabled}
               rows={rows}
               readOnly={readOnly}
+              maxLength={MAX_INPUT_LENGTH}
             />
           ) : (
             <input
@@ -190,6 +214,7 @@ const TextInput: React.FC<TextInputProps> = ({
               required={required}
               disabled={disabled}
               readOnly={readOnly}
+              maxLength={MAX_INPUT_LENGTH}
             />
           )}
 
@@ -208,6 +233,8 @@ const TextInput: React.FC<TextInputProps> = ({
           )}
         </div>
       </div>
+
+      {renderCharacterCount()}
 
       {multiEntry && chips.length > 0 && (
         <div className="chip-container">

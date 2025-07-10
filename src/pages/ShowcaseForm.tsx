@@ -63,8 +63,8 @@ const ShowcaseForm = () => {
           onChange={setExternal}
           placeholder="hii write here something for placeholder sushant sir"
           labelPosition="external"
-          multiEntry
           infoTip="This is external label infotip"
+showCharacterCount
         />
       </div>
 
@@ -120,6 +120,7 @@ const ShowcaseForm = () => {
           rows={4}
           onChange={setActivated}
           MAX_INPUT_LENGTH={200}
+          showCharacterCount
         />
       </div>
       <div >

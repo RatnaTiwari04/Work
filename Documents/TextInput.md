@@ -33,7 +33,9 @@ This is a fully customizable and reusable **React + TypeScript** input component
 | `MAX_INPUT_LENGTH` | `number`                                            | Limits character input                              |
 | `multiline`        | `boolean`                                           | Renders `<textarea>` instead of `<input>`           |
 | `rows`             | `number`                                            | Number of rows for multiline textareas              |
-| `multientry`       | `boolean`                                           | 	Enables chips-based multi-entry mode               |
+| `multientry`       | `boolean`                                           | Enables chips-based multi-entry mode                |
+|`showCharacterCount`| `boolean`                                           | Checks For no of Characters used                    |
+| 'infotip`          | 'string`                                            | To display the message as info                      | 
 ---
 
 ### Component Logic:
