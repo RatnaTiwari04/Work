@@ -9,7 +9,7 @@ This is a fully customizable and reusable **React + TypeScript** input component
 
 **Component Location:**
 ```
-/components/TextInput.tsx
+/components/TextInput/TextInput.tsx
 ```
 
 ---
