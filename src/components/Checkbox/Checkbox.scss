@@ -1,0 +1,433 @@
+@use '../../styles/Colors' as *;
+@use 'sass:color';
+
+.checkbox-container {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  margin-bottom: 1.5rem;
+  margin-top: 1.5rem;
+
+  .checkbox-wrapper {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    transition: all 0.2s ease;
+
+    &.inline {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    // Auto-wrap for more than 3 options
+    &:not(.inline) {
+      &.auto-wrap {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px 16px;
+        
+        @media (max-width: 768px) {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        
+        @media (max-width: 480px) {
+          grid-template-columns: 1fr;
+        }
+      }
+    }
+
+    &.error {
+      .checkbox-option .checkbox-box {
+        border-color: $error-color;
+      }
+    }
+
+    &.warning {
+      .checkbox-option .checkbox-box {
+        border-color: $warning-color;
+      }
+    }
+
+    &.info {
+      .checkbox-option .checkbox-box {
+        border-color: $info-color;
+      }
+    }
+
+    &.success {
+      .checkbox-option .checkbox-box {
+        border-color: $success-color;
+      }
+    }
+
+    &.disabled {
+      .checkbox-option {
+        opacity: 0.6;
+        pointer-events: none;
+      }
+    }
+  }
+
+  .checkbox-option {
+    position: relative;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover:not(.disabled) {
+      .checkbox-box {
+        border-color: color.adjust($border-color, $lightness: -10%);
+      }
+    }
+
+    &.checked {
+      .checkbox-box {
+        border-color: $primary-color;
+        background: $primary-color;
+        
+        .checkbox-checkmark {
+          opacity: 1;
+          transform: scale(1);
+          color: white;
+        }
+      }
+
+      &.error .checkbox-box {
+        border-color: $error-color;
+        background: $error-color;
+      }
+
+      &.warning .checkbox-box {
+        border-color: $warning-color;
+        background: $warning-color;
+      }
+
+      &.info .checkbox-box {
+        border-color: $info-color;
+        background: $info-color;
+      }
+
+      &.success .checkbox-box {
+        border-color: $success-color;
+        background: $success-color;
+      }
+    }
+
+    &.disabled {
+      cursor: not-allowed;
+      
+      .checkbox-box {
+        background: $background-disabled;
+        border-color: color.adjust($border-color, $lightness: 10%);
+        
+        .checkbox-checkmark {
+          color: $disabled-color;
+        }
+      }
+      
+      .checkbox-option-label {
+        color: $disabled-color;
+      }
+    }
+
+    .checkbox-input-hidden {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+      height: 0;
+      width: 0;
+      margin: 0;
+      padding: 0;
+      border: none;
+      outline: none;
+    }
+
+    .checkbox-field {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 4px 0;
+      cursor: pointer;
+    }
+
+    .checkbox-box {
+      width: 20px;
+      height: 20px;
+      border: 1.5px solid #ccc;
+      border-radius: 4px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+      position: relative;
+
+      .checkbox-checkmark {
+        opacity: 0;
+        transform: scale(0);
+        transition: all 0.2s ease;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        svg {
+          width: 12px;
+          height: 12px;
+        }
+      }
+    }
+
+    .checkbox-option-label {
+      font-size: 14px;
+      color: $text-color;
+      cursor: pointer;
+      line-height: 1.4;
+      transition: color 0.2s ease;
+      font-family: inherit;
+    }
+
+    &:focus-within .checkbox-box {
+      outline: 2px solid $primary-color;
+      outline-offset: 2px;
+      box-shadow: 0 0 0 3px rgba(90, 79, 255, 0.05);
+    }
+
+    &.focused .checkbox-box {
+      border-color: $primary-color;
+      box-shadow: 0 0 0 3px rgba(90, 79, 255, 0.05);
+    }
+
+    &.error:focus-within .checkbox-box {
+      box-shadow: 0 0 0 3px rgba(255, 77, 79, 0.1);
+    }
+
+    &.warning:focus-within .checkbox-box {
+      box-shadow: 0 0 0 3px rgba(250, 173, 20, 0.1);
+    }
+
+    &.info:focus-within .checkbox-box {
+      box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.1);
+    }
+
+    &.success:focus-within .checkbox-box {
+      box-shadow: 0 0 0 3px rgba(82, 196, 26, 0.1);
+    }
+  }
+
+  .checkbox-label {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: $text-color;
+    display: block;
+
+    .required {
+      color: $error-color;
+      margin-left: 4px;
+    }
+  }
+
+  // Info tooltip (matching TextInput structure)
+  .info-icon {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 6px;
+    cursor: pointer;
+    color: $disabled-color;
+    vertical-align: middle;
+    transition: color 0.2s ease;
+    position: relative;
+    z-index: 15;
+    pointer-events: auto;
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    &:hover {
+      color: $primary-color;
+      
+      .tooltip {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(-2px);
+      }
+    }
+
+    .tooltip {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(0);
+      background: white;
+      color: black;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s ease;
+      z-index: 1000;
+      pointer-events: none;
+      margin-bottom: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      border: 1px solid #e0e0e0;
+
+      &::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 5px solid transparent;
+        border-top-color: white;
+      }
+    }
+  }
+
+  // Error/validation messages (matching TextInput structure)
+  .message {
+    font-size: 12px;
+    margin-top: 4px;
+    line-height: 1.4;
+
+    &.error {
+      color: $error-color;
+    }
+
+    &.warning {
+      color: $warning-color;
+    }
+
+    &.info {
+      color: $info-color;
+    }
+
+    &.success {
+      color: $success-color;
+    }
+  }
+
+  // Error icon (matching TextInput structure)
+  .checkbox__error-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $error-color;
+    pointer-events: none;
+    z-index: 1;
+    
+    svg {
+      display: block;
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+// Form showcase styling (matching TextInput structure)
+.form-showcase {
+  width: 100%;
+  max-width: 450px;
+  margin: 0 auto;
+  padding: 1rem 0rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+ 
+  h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: $text-color;
+    font-weight: 600;
+    background-color: #f5f3f3;
+  }
+
+  .form-group {
+        margin: 2rem;
+    padding: 2px 12px;
+    border: 0.5px solid #dccfcf;
+    
+    h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #777;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  label {
+    font-weight: 500;
+    display: block;
+    margin-bottom: 0.5rem;
+    color: $text-color;
+  }
+
+  .required {
+    color: $error-color;
+    margin-left: 4px;
+  }
+
+  @media (max-width: 768px) {
+    max-width: 100%;
+    padding: 1rem;
+    margin: 0 1rem;
+  }
+
+  .checkbox-container {
+    margin-bottom: 2rem;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+// Form row styling (matching TextInput structure)
+.form-row {
+  display: flex;
+  gap: 1rem;
+
+  > * {
+    flex: 1;
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .checkbox-container {
+    .checkbox-group.inline {
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .checkbox-group.auto-wrap {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .checkbox-container {
+    .checkbox-group.auto-wrap {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+  }
+}
