@@ -4,7 +4,7 @@
 // import ShowcaseForm from "./pages/ShowcaseForm";
 // import Example4 from "./pages/Example4"; // make sure this is imported
 // import PasswordShowcaseForm from "./pages/PasswordShowcaseForm";
-import DateInputShowcase from "./pages/RadioButtonShowcase";
+import DateInputShowcase from "./pages/EmailInputShowcase";
 
 const App = () => (
   <DateInputShowcase/>
