@@ -10,7 +10,7 @@ This is a fully customizable and reusable **React + TypeScript** radio button co
 
 **Component Location:**
 ```
-/components/RadioButton.tsx
+/components/Radiobutton/RadioButton.tsx
 ```
 
 ---
