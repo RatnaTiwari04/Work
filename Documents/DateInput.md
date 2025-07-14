@@ -14,7 +14,7 @@ This is a fully customizable and reusable **React + TypeScript** date input comp
 
 **Component Location:**
 ```
-/components/DateInput.tsx
+/components/DateInput/DateInput.tsx
 ```
 
 ---
