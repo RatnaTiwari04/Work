@@ -1,309 +1,400 @@
 @use '../../styles/Colors' as *;
 @use 'sass:color';
 
-.radio-showcase {
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #fafafa;
-  min-height: 100vh;
+.radio-button-container {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  margin-bottom: 1.5rem;
+  margin-top: 1.5rem;
 
+  .radio-wrapper {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    transition: all 0.2s ease;
+
+    &.inline {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    &.error {
+      .radio-option .radio-circle {
+        border-color: $error-color;
+      }
+    }
+
+    &.warning {
+      .radio-option .radio-circle {
+        border-color: $warning-color;
+      }
+    }
+
+    &.info {
+      .radio-option .radio-circle {
+        border-color: $info-color;
+      }
+    }
+
+    &.success {
+      .radio-option .radio-circle {
+        border-color: $success-color;
+      }
+    }
+
+    &.disabled {
+      .radio-option {
+        opacity: 0.6;
+        pointer-events: none;
+      }
+    }
+  }
+
+  .radio-option {
+    position: relative;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover:not(.disabled) {
+      .radio-circle {
+        border-color: color.adjust($border-color, $lightness: -10%);
+      }
+    }
+
+    &.checked {
+      .radio-circle {
+        border-color: $primary-color;
+        
+        .radio-dot {
+          transform: scale(1);
+          background: $primary-color;
+        }
+      }
+
+      &.error .radio-circle {
+        border-color: $error-color;
+        .radio-dot {
+          background: $error-color;
+        }
+      }
+
+      &.warning .radio-circle {
+        border-color: $warning-color;
+        .radio-dot {
+          background: $warning-color;
+        }
+      }
+
+      &.info .radio-circle {
+        border-color: $info-color;
+        .radio-dot {
+          background: $info-color;
+        }
+      }
+
+      &.success .radio-circle {
+        border-color: $success-color;
+        .radio-dot {
+          background: $success-color;
+        }
+      }
+    }
+
+    &.disabled {
+      cursor: not-allowed;
+      
+      .radio-circle {
+        background: $background-disabled;
+        border-color: color.adjust($border-color, $lightness: 10%);
+        
+        .radio-dot {
+          background: $disabled-color;
+        }
+      }
+      
+      .radio-option-label {
+        color: $disabled-color;
+      }
+    }
+
+    .radio-input-hidden {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+      height: 0;
+      width: 0;
+      margin: 0;
+      padding: 0;
+      border: none;
+      outline: none;
+    }
+
+    .radio-button-field {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 4px 0;
+      cursor: pointer;
+    }
+
+    .radio-circle {
+      width: 20px;
+      height: 20px;
+      border: 1.5px solid #ccc;
+      border-radius: 50%;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      flex-shrink: 0;
+      position: relative;
+
+      .radio-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: $primary-color;
+        transform: scale(0);
+        transition: transform 0.2s ease;
+      }
+    }
+
+    .radio-option-label {
+      font-size: 14px;
+      color: $text-color;
+      cursor: pointer;
+      line-height: 1.4;
+      transition: color 0.2s ease;
+      font-family: inherit;
+    }
+
+    &:focus-within .radio-circle {
+      outline: 2px solid $primary-color;
+      outline-offset: 2px;
+      box-shadow: 0 0 0 3px rgba(90, 79, 255, 0.05);
+    }
+
+    &.focused .radio-circle {
+      border-color: $primary-color;
+      box-shadow: 0 0 0 3px rgba(90, 79, 255, 0.05);
+    }
+
+    &.error:focus-within .radio-circle {
+      box-shadow: 0 0 0 3px rgba(255, 77, 79, 0.1);
+    }
+
+    &.warning:focus-within .radio-circle {
+      box-shadow: 0 0 0 3px rgba(250, 173, 20, 0.1);
+    }
+
+    &.info:focus-within .radio-circle {
+      box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.1);
+    }
+
+    &.success:focus-within .radio-circle {
+      box-shadow: 0 0 0 3px rgba(82, 196, 26, 0.1);
+    }
+  }
+
+  .radio-button-label {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: $text-color;
+    display: block;
+
+    .required {
+      color: $error-color;
+      margin-left: 4px;
+    }
+  }
+
+  // Info tooltip (matching TextInput structure)
+  .info-icon {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 6px;
+    cursor: pointer;
+    color: $disabled-color;
+    vertical-align: middle;
+    transition: color 0.2s ease;
+    position: relative;
+    z-index: 15;
+    pointer-events: auto;
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    &:hover {
+      color: $primary-color;
+      
+      .tooltip {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(-2px);
+      }
+    }
+
+    .tooltip {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(0);
+      background: white;
+      color: black;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s ease;
+      z-index: 1000;
+      pointer-events: none;
+      margin-bottom: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      border: 1px solid #e0e0e0;
+
+      &::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 5px solid transparent;
+        border-top-color: white;
+      }
+    }
+  }
+
+  // Error/validation messages (matching TextInput structure)
+  .message {
+    font-size: 12px;
+    margin-top: 4px;
+    line-height: 1.4;
+
+    &.error {
+      color: $error-color;
+    }
+
+    &.warning {
+      color: $warning-color;
+    }
+
+    &.info {
+      color: $info-color;
+    }
+
+    &.success {
+      color: $success-color;
+    }
+  }
+
+  // Error icon (matching TextInput structure)
+  .radio-button__error-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $error-color;
+    pointer-events: none;
+    z-index: 1;
+    
+    svg {
+      display: block;
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+// Form showcase styling (matching TextInput structure)
+.form-showcase {
+  width: 100%;
+  max-width: 350px;
+  margin: 0 auto;
+  padding: 1rem 0rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+ 
   h2 {
     text-align: center;
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
     color: $text-color;
     font-weight: 600;
-    font-size: 24px;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid #e0e0e0;
   }
 
   .form-group {
-    margin-bottom: 2.5rem;
-    background: white;
-    border-radius: 8px;
-    padding: 1.5rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    border: 1px solid #e8e8e8;
-    transition: box-shadow 0.2s ease;
-
-    &:hover {
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-    }
+    margin-bottom: 2rem;
     
     h3 {
-      font-size: 16px;
+      font-size: 14px;
       font-weight: 600;
-      color: $text-color;
-      margin-bottom: 1rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 1px solid #f0f0f0;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-
-      &::before {
-        content: "📋";
-        font-size: 14px;
-      }
+      color: #777;
     }
 
     &:last-child {
       margin-bottom: 0;
     }
-
-    // Special styling for different showcase sections
-    &:nth-child(even) {
-      background: #f8f9fa;
-    }
-
-    // Add visual indicators for different states
-    &:has(.radio-button-container.error) {
-      border-left: 4px solid $error-color;
-      
-      h3::before {
-        content: "⚠️";
-      }
-    }
-
-    &:has(.radio-button-container.warning) {
-      border-left: 4px solid $warning-color;
-      
-      h3::before {
-        content: "⚠️";
-      }
-    }
-
-    &:has(.radio-button-container.info) {
-      border-left: 4px solid $info-color;
-      
-      h3::before {
-        content: "ℹ️";
-      }
-    }
-
-    &:has(.radio-button-container.success) {
-      border-left: 4px solid $success-color;
-      
-      h3::before {
-        content: "✅";
-      }
-    }
   }
 
-  .navigation-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin-top: 3rem;
-    padding-top: 2rem;
-    border-top: 2px solid #e0e0e0;
-
-    .btn {
-      padding: 12px 24px;
-      background: $primary-color;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-
-      &:hover {
-        background: color.adjust($primary-color, $lightness: -10%);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(90, 79, 255, 0.3);
-      }
-
-      &:active {
-        transform: translateY(0);
-      }
-
-      &:focus {
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(90, 79, 255, 0.2);
-      }
-
-      &:first-child {
-        background: #6c757d;
-        
-        &:hover {
-          background: color.adjust(#6c757d, $lightness: -10%);
-          box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
-        }
-      }
-    }
+  label {
+    font-weight: 500;
+    display: block;
+    margin-bottom: 0.5rem;
+    color: $text-color;
   }
 
-  // Custom styling for the custom class example
-  .custom-radio-style {
-    .radio-item {
-      .radio-indicator {
-        border-width: 3px;
-        border-style: dashed;
-        
-        .radio-dot {
-          background: linear-gradient(45deg, $primary-color, $info-color);
-        }
-      }
-    }
+  .required {
+    color: $error-color;
+    margin-left: 4px;
   }
 
-  // Enhanced responsive design
   @media (max-width: 768px) {
     max-width: 100%;
     padding: 1rem;
-    margin: 0;
+    margin: 0 1rem;
+  }
 
-    h2 {
-      font-size: 20px;
-      margin-bottom: 2rem;
+  .radio-button-container {
+    margin-bottom: 2rem;
+    
+    &:last-child {
+      margin-bottom: 0;
     }
+  }
+}
 
-    .form-group {
-      margin-bottom: 1.5rem;
-      padding: 1rem;
-      
-      h3 {
-        font-size: 14px;
-      }
-    }
+// Form row styling (matching TextInput structure)
+.form-row {
+  display: flex;
+  gap: 1rem;
 
-    .navigation-buttons {
+  > * {
+    flex: 1;
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .radio-button-container {
+    .radio-group.inline {
       flex-direction: column;
-      gap: 0.5rem;
-      
-      .btn {
-        width: 100%;
-        justify-content: center;
-      }
-    }
-  }
-
-  @media (max-width: 480px) {
-    padding: 0.5rem;
-    
-    .form-group {
-      padding: 0.75rem;
-      border-radius: 4px;
-    }
-  }
-}
-
-// Additional showcase-specific styles
-.radio-showcase {
-  // Highlight different layout examples
-  .form-group:has(.radio-button-container.label-left) {
-    .radio-button-container {
-      background: linear-gradient(90deg, rgba(90, 79, 255, 0.02), transparent);
-      padding: 1rem;
-      border-radius: 4px;
-    }
-  }
-
-  .form-group:has(.radio-button-container.label-right) {
-    .radio-button-container {
-      background: linear-gradient(270deg, rgba(90, 79, 255, 0.02), transparent);
-      padding: 1rem;
-      border-radius: 4px;
-    }
-  }
-
-  .form-group:has(.radio-button-container.inline) {
-    .radio-button-container {
-      background: rgba(90, 79, 255, 0.02);
-      padding: 1rem;
-      border-radius: 4px;
-      border: 1px dashed rgba(90, 79, 255, 0.2);
-    }
-  }
-
-  // Visual feedback for state demonstrations
-  .form-group {
-    position: relative;
-    
-    &::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 4px;
-      height: 100%;
-      background: transparent;
-      border-radius: 0 8px 8px 0;
-      transition: background-color 0.2s ease;
-    }
-  }
-
-  // Different colored indicators for different sections
-  .form-group:nth-child(3n+1)::after {
-    background: rgba(90, 79, 255, 0.1);
-  }
-
-  .form-group:nth-child(3n+2)::after {
-    background: rgba(24, 144, 255, 0.1);
-  }
-
-  .form-group:nth-child(3n+3)::after {
-    background: rgba(82, 196, 26, 0.1);
-  }
-}
-
-// Dark mode support (optional)
-@media (prefers-color-scheme: dark) {
-  .radio-showcase {
-    background: #1a1a1a;
-    color: #ffffff;
-
-    .form-group {
-      background: #2d2d2d;
-      border-color: #404040;
-
-      &:nth-child(even) {
-        background: #262626;
-      }
-
-      &:hover {
-        box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
-      }
-    }
-
-    h2 {
-      color: #ffffff;
-      border-bottom-color: #404040;
-    }
-
-    h3 {
-      color: #ffffff;
-      border-bottom-color: #404040;
-    }
-  }
-}
-
-// Print styles
-@media print {
-  .radio-showcase {
-    background: white;
-    box-shadow: none;
-    max-width: none;
-    padding: 1rem;
-
-    .form-group {
-      background: white;
-      box-shadow: none;
-      border: 1px solid #ddd;
-      page-break-inside: avoid;
-    }
-
-    .navigation-buttons {
-      display: none;
+      gap: 8px;
     }
   }
 }

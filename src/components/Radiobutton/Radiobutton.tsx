@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Info } from "lucide-react";
 import "./RadioButton.scss";
 
 type Variant = "error" | "warning" | "info" | "success" | "";
-type LabelPosition = "left" | "right" | "top" | "bottom";
 
 interface RadioOption {
   value: string;
@@ -13,43 +12,54 @@ interface RadioOption {
 
 interface RadioButtonProps {
   label?: string;
-  labelPosition?: LabelPosition;
-  options: RadioOption[];
-  value?: string;
-  onChange?: (value: string) => void;
-  name: string;
   required?: boolean;
   disabled?: boolean;
+  value?: string;
+  onChange?: (value: string) => void;
+  options: RadioOption[];
   message?: string;
   variant?: Variant;
+  name: string;
   className?: string;
-  inline?: boolean;
   infoTip?: string;
+  inline?: boolean;
+  readOnly?: boolean;
 }
 
 const RadioButton: React.FC<RadioButtonProps> = ({
   label,
-  labelPosition = "top",
-  options,
-  value = "",
-  onChange,
-  name,
   required = false,
   disabled = false,
+  value = "",
+  onChange,
+  options = [],
   message = "",
   variant = "",
+  name,
   className = "",
-  inline = false,
   infoTip,
+  inline = false,
+  readOnly = false,
 }) => {
+  const [focused, setFocused] = useState(false);
   const [touched, setTouched] = useState(false);
   const [selectedValue, setSelectedValue] = useState(value);
 
+  useEffect(() => {
+    setSelectedValue(value);
+  }, [value]);
+
   const showMessage = touched && variant && message;
 
+  const handleFocus = () => setFocused(true);
+
+  const handleBlur = () => {
+    setFocused(false);
+    setTouched(true);
+  };
+
   const handleChange = (optionValue: string) => {
-    if (disabled) return;
-    
+    if (disabled || readOnly) return;
     setSelectedValue(optionValue);
     setTouched(true);
     onChange?.(optionValue);
@@ -58,6 +68,8 @@ const RadioButton: React.FC<RadioButtonProps> = ({
   const getRadioState = () => {
     if (disabled) return "disabled";
     if (variant === "error") return "error";
+    if (focused) return "focused";
+    if (selectedValue) return "activated";
     return "default";
   };
 
@@ -65,7 +77,6 @@ const RadioButton: React.FC<RadioButtonProps> = ({
 
   const containerClass = [
     "radio-button-container",
-    labelPosition ? `label-${labelPosition}` : "",
     variant,
     inline ? "inline" : "",
     className,
@@ -81,75 +92,75 @@ const RadioButton: React.FC<RadioButtonProps> = ({
       </span>
     );
 
-  const renderLabel = () => {
-    if (!label) return null;
-    
-    return (
-      <div className="radio-group-label">
-        {label}
-        {required && <span className="required">*</span>}
-        {renderInfoTip()}
-      </div>
-    );
-  };
-
-  const renderRadioOptions = () => (
-    <div className={`radio-options ${inline ? "inline" : ""}`}>
-      {options.map((option) => {
-        const isSelected = selectedValue === option.value;
-        const isDisabled = disabled || option.disabled;
-        
-        const radioItemClass = [
-          "radio-item",
-          radioState,
-          isSelected ? "selected" : "",
-          isDisabled ? "disabled" : "",
-        ]
-          .filter(Boolean)
-          .join(" ");
-
-        return (
-          <div key={option.value} className={radioItemClass}>
-            <input
-              type="radio"
-              id={`${name}-${option.value}`}
-              name={name}
-              value={option.value}
-              checked={isSelected}
-              onChange={() => handleChange(option.value)}
-              required={required}
-              disabled={isDisabled}
-              className="radio-input"
-            />
-            <label
-              htmlFor={`${name}-${option.value}`}
-              className="radio-label"
-            >
-              <span className="radio-indicator">
-                <span className="radio-dot" />
-              </span>
-              <span className="radio-text">{option.label}</span>
-            </label>
-          </div>
-        );
-      })}
-    </div>
-  );
-
   return (
     <div className={containerClass}>
-      {labelPosition === "top" && renderLabel()}
-      
+      {label && (
+        <label className="radio-button-label">
+          {label}
+          {required && <span className="required">*</span>}
+          {renderInfoTip()}
+        </label>
+      )}
+
       <div className="radio-wrapper">
-        {labelPosition === "left" && renderLabel()}
-        
-        {renderRadioOptions()}
-        
-        {labelPosition === "right" && renderLabel()}
+        <div className={`radio-group ${radioState} ${inline ? "inline" : ""}`}>
+          {options.map((option, index) => {
+            const isChecked = selectedValue === option.value;
+            const isDisabled = disabled || option.disabled;
+            
+            const optionClass = [
+              "radio-option",
+              isChecked ? "checked" : "",
+              isDisabled ? "disabled" : "",
+              radioState,
+            ]
+              .filter(Boolean)
+              .join(" ");
+
+            return (
+              <div key={option.value} className={optionClass}>
+                <input
+                  type="radio"
+                  id={`${name}-${index}`}
+                  name={name}
+                  value={option.value}
+                  checked={isChecked}
+                  onChange={() => handleChange(option.value)}
+                  onFocus={handleFocus}
+                  onBlur={handleBlur}
+                  disabled={isDisabled}
+                  readOnly={readOnly}
+                  className="radio-input-hidden"
+                />
+                {/* Fixed: Use label to wrap the entire radio button field */}
+                <label htmlFor={`${name}-${index}`} className="radio-button-field">
+                  <div className="radio-circle">
+                    <div className="radio-dot" />
+                  </div>
+                  <span className="radio-option-label">
+                    {option.label}
+                  </span>
+                </label>
+              </div>
+            );
+          })}
+        </div>
+
+        {variant === "error" && (
+          <div className="radio-button__error-icon">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1" />
+              <path
+                d="M8 4v4M8 10h0"
+                stroke="currentColor"
+                strokeWidth="1"
+                strokeLinecap="round"
+              />
+            </svg>
+          </div>
+        )}
       </div>
-      
-      {labelPosition === "bottom" && renderLabel()}
-      
+
       {showMessage && <div className={`message ${variant}`}>{message}</div>}
     </div>
   );
