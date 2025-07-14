@@ -10,7 +10,7 @@ This is a fully customizable and reusable **React + TypeScript** password input 
 
 **Component Location:**
 ```
-/components/PasswordInput.tsx
+/components/PasswordInput/PasswordInput.tsx
 ```
 
 ---
