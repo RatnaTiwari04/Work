@@ -10,7 +10,7 @@ This is a fully customizable and reusable **React + TypeScript** checkbox compon
 
 **Component Location:**
 ```
-/components/Checkbox.tsx
+/components/Checkbox/Checkbox.tsx
 ```
 
 ---
