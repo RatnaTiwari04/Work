@@ -12,7 +12,7 @@ This is a fully customizable and reusable **React + TypeScript** email input com
 
 **Component Location:**
 ```
-/components/EmailInput.tsx
+/components/Email/EmailInput.tsx
 ```
 
 ---
