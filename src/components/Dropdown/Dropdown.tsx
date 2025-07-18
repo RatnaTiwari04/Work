@@ -237,13 +237,16 @@ const Dropdown: React.FC<DropdownProps> = ({
     setShowAllChips(!showAllChips);
   };
 
-  // Render chips with expand/collapse functionality
+  // Render chips with expand/collapse functionality in reverse order
   const renderChips = () => {
     if (!multiSelect || selectedValues.length === 0) return null;
 
-    const shouldShowMoreButton = selectedValues.length > maxChipsToShow;
-    const chipsToShow = showAllChips ? selectedValues : selectedValues.slice(0, maxChipsToShow);
-    const remainingCount = selectedValues.length - maxChipsToShow;
+    // Reverse the array to show most recent selections first
+    const reversedValues = [...selectedValues].reverse();
+    
+    const shouldShowMoreButton = reversedValues.length > maxChipsToShow;
+    const chipsToShow = showAllChips ? reversedValues : reversedValues.slice(0, maxChipsToShow);
+    const remainingCount = reversedValues.length - maxChipsToShow;
 
     return (
       <div className="chip-container">

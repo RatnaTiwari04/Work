@@ -99,7 +99,6 @@ const handleToggle = () => {
   }
 };
 ```
-
 ##### Option Selection:
 ```ts
 const handleOptionClick = (optionValue: string) => {
