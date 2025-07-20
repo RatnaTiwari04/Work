@@ -432,7 +432,7 @@ const DateInput: React.FC<DateInputProps> = ({
 
             <div className="calendar-grid">
               <div className="calendar-header">
-                {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day, index) => (
+                {["S", "M", "T", "W", "T", "F", "S"].map((day, index) => (
                   <div key={index} className="day-header">
                     {day}
                   </div>
