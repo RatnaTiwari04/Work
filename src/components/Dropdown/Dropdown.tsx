@@ -61,7 +61,8 @@ const Dropdown: React.FC<DropdownProps> = ({
   const [selectedValues, setSelectedValues] = useState<string[]>([]);
   const [singleValue, setSingleValue] = useState<string>("");
   const [customInputValue, setCustomInputValue] = useState<string>("");
-  const [showAllChips, setShowAllChips] = useState(false); // New state for chip expansion
+  const [showAllChips, setShowAllChips] = useState(false);
+  
   
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
