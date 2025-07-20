@@ -125,7 +125,7 @@ const DateInputShowcase = () => {
           value={differentFormat}
           onChange={setDifferentFormat}
           placeholder="YYYY/MM/DD"
-          dateFormat="YYYY-MM-DD"
+          dateFormat="DD/MM/YYYY"
           labelPosition="external"
           infoTip="Date in European format"
         />

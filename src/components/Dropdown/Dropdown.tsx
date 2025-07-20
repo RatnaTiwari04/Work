@@ -336,32 +336,35 @@ const Dropdown: React.FC<DropdownProps> = ({
             aria-haspopup="listbox"
           >
             <div className="dropdown-content">
-              {allowCustomInput ? (
-                <input
-                  ref={customInputRef}
-                  type="text"
-                  value={customInputValue}
-                  onChange={handleCustomInputChange}
-                  onKeyDown={handleCustomInputKeyDown}
-                  onFocus={() => setFocused(true)}
-                  onBlur={() => setFocused(false)}
-                  placeholder={labelPosition === "internal" || labelPosition === "middle" ? "" : placeholder}
-                  disabled={disabled}
-                  className="custom-input-field"
-                />
-              ) : (
-                <>
-                  {!hasValue && (
-                    <span className="dropdown-placeholder">
-                      {labelPosition === "internal" || labelPosition === "middle" ? "" : placeholder}
-                    </span>
-                  )}
-                  {hasValue && (
-                    <span className="dropdown-value">{getDisplayValue()}</span>
-                  )}
-                </>
-              )}
-            </div>
+  {multiSelect && selectedValues.length > 0 && renderChips()}
+
+  {allowCustomInput ? (
+    <input
+      ref={customInputRef}
+      type="text"
+      value={customInputValue}
+      onChange={handleCustomInputChange}
+      onKeyDown={handleCustomInputKeyDown}
+      onFocus={() => setFocused(true)}
+      onBlur={() => setFocused(false)}
+      placeholder={labelPosition === "internal" || labelPosition === "middle" ? "" : placeholder}
+      disabled={disabled}
+      className="custom-input-field"
+    />
+  ) : (
+    <>
+      {!hasValue && (
+        <span className="dropdown-placeholder">
+          {labelPosition === "internal" || labelPosition === "middle" ? "" : placeholder}
+        </span>
+      )}
+      {!multiSelect && hasValue && (
+        <span className="dropdown-value">{getDisplayValue()}</span>
+      )}
+    </>
+  )}
+</div>
+
 
             <div className="dropdown-icons">
               {showClearButton && hasValue && !disabled && (
@@ -438,6 +441,8 @@ const Dropdown: React.FC<DropdownProps> = ({
                           checked={selectedValues.includes(option.value)}
                           onChange={() => {}}
                           tabIndex={-1}
+                          placeholder={`Select ${option.label}`}
+                          title={`Select ${option.label}`}
                         />
                       </div>
                     )}
@@ -450,7 +455,7 @@ const Dropdown: React.FC<DropdownProps> = ({
         )}
       </div>
 
-      {renderChips()}
+      {/* {renderChips()} */}
 
       {showMessage && <div className={`message ${variant}`}>{message}</div>}
     </div>
