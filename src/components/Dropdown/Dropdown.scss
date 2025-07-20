@@ -299,7 +299,7 @@
     z-index: 1000;
     overflow: hidden;
     max-height: 200px;
-    overflow-y: auto;
+    overflow-y: hidden;
 
     .dropdown-search {
       padding: 8px;
@@ -307,7 +307,7 @@
 
       .search-input {
         width: 100%;
-        padding: 6px 8px;
+        padding: 6px 1px;
         border: 1px solid #ddd;
         border-radius: 2px;
         font-size: 13px;
@@ -424,7 +424,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: 3px;
-    margin-top: 8px;
+    margin-top: 0px;
     justify-content: flex-start;
 
     .chip {
@@ -438,7 +438,6 @@
       border-radius: 8px;
       line-height: 1;
       height: 20px;
-
 
       button {
         padding: 0;
