@@ -233,7 +233,7 @@ const Dropdown: React.FC<DropdownProps> = ({
     );
 
   // Updated function to handle chip expansion
-  const handleShowMoreChips = (e: React.MouseEvent) => {
+  const handleShowMoreChips = (e: React.MouseEvent | React.KeyboardEvent) => {
     e.stopPropagation();
     setShowAllChips(!showAllChips);
   };

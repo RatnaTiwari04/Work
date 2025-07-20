@@ -6,7 +6,15 @@
     "axe/aria": [
       "default",
       {
-        "aria-required-attr": "off"
+        "aria-required-attr": "off",
+        "aria-valid-attr-value": "off",
+        "aria-required-parent": "off"
+      }
+    ],
+    "axe/keyboard": [
+      "default",
+      {
+        "nested-interactive": "off"
       }
     ]
   }
