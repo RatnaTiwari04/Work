@@ -3,7 +3,7 @@ import { ChevronDown, ChevronUp, X, Info } from "lucide-react";
 import "./Dropdown.scss";
 
 type Variant = "error" | "warning" | "info" | "success" | "";
-type LabelPosition = "internal" | "external" | "middle";
+type LabelPosition = "internal" | "external" | "middle" | "left-inline"; 
 
 interface DropdownOption {
   value: string;
@@ -17,6 +17,7 @@ interface DropdownProps {
   placeholder?: string;
   required?: boolean;
   disabled?: boolean;
+  readOnly?: boolean;
   value?: string | string[];
   onChange?: (value: string | string[]) => void;
   message?: string;
@@ -30,7 +31,8 @@ interface DropdownProps {
   infoTip?: string;
   maxHeight?: number;
   showClearButton?: boolean;
-  maxChipsToShow?: number; // New prop to control chip display limit
+  maxChipsToShow?: number;
+  showLabelWithValue?: boolean; // Keep this for backward compatibility
 }
 
 const Dropdown: React.FC<DropdownProps> = ({
@@ -39,6 +41,7 @@ const Dropdown: React.FC<DropdownProps> = ({
   placeholder = "Select an option",
   required = false,
   disabled = false,
+  readOnly = false,
   value,
   onChange,
   message = "",
@@ -52,7 +55,8 @@ const Dropdown: React.FC<DropdownProps> = ({
   infoTip,
   maxHeight = 200,
   showClearButton = true,
-  maxChipsToShow = 3, // Default to showing 3 chips
+  maxChipsToShow = 3,
+  showLabelWithValue = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [focused, setFocused] = useState(false);
@@ -103,7 +107,9 @@ const Dropdown: React.FC<DropdownProps> = ({
 
   const getDisplayValue = () => {
     if (multiSelect) {
-      if (selectedValues.length === 0) return "";
+      if (selectedValues.length === 0) {
+        return "";
+      }
       if (selectedValues.length === 1) {
         const option = options.find(opt => opt.value === selectedValues[0]);
         return option?.label || selectedValues[0];
@@ -113,14 +119,29 @@ const Dropdown: React.FC<DropdownProps> = ({
       if (allowCustomInput) {
         return customInputValue;
       }
-      if (!singleValue) return "";
+      if (!singleValue) {
+        return "";
+      }
       const option = options.find(opt => opt.value === singleValue);
       return option?.label || singleValue;
     }
   };
 
+  // New function to get display value with left-inline label
+  const getLeftInlineDisplayValue = () => {
+    const displayValue = getDisplayValue();
+    if (labelPosition === "left-inline" && label) {
+      return displayValue ? `${label}: ${displayValue}` : `${label}: `;
+    }
+    // Keep backward compatibility with showLabelWithValue
+    if (showLabelWithValue && label) {
+      return displayValue ? `${label}: ${displayValue}` : `${label}: `;
+    }
+    return displayValue;
+  };
+
   const handleToggle = () => {
-    if (disabled) return;
+    if (disabled || readOnly) return;
     setIsOpen(!isOpen);
     setFocused(!isOpen);
     if (!isOpen && searchable) {
@@ -129,6 +150,8 @@ const Dropdown: React.FC<DropdownProps> = ({
   };
 
   const handleOptionClick = (optionValue: string) => {
+    if (readOnly) return;
+    
     if (multiSelect) {
       const newValues = selectedValues.includes(optionValue)
         ? selectedValues.filter(val => val !== optionValue)
@@ -149,6 +172,8 @@ const Dropdown: React.FC<DropdownProps> = ({
 
   const handleClear = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (readOnly) return;
+    
     if (multiSelect) {
       setSelectedValues([]);
       onChange?.([]);
@@ -162,6 +187,8 @@ const Dropdown: React.FC<DropdownProps> = ({
   };
 
   const handleRemoveChip = (valueToRemove: string) => {
+    if (readOnly) return;
+    
     const newValues = selectedValues.filter(val => val !== valueToRemove);
     setSelectedValues(newValues);
     onChange?.(newValues);
@@ -172,14 +199,17 @@ const Dropdown: React.FC<DropdownProps> = ({
   };
 
   const handleCustomInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (readOnly) return;
+    
     const newValue = e.target.value;
     setCustomInputValue(newValue);
     onChange?.(newValue);
   };
 
   const handleCustomInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (readOnly) return;
+    
     if (e.key === 'Enter' && customInputValue.trim()) {
-      // Add custom input as new option if it doesn't exist
       const existingOption = options.find(opt => 
         opt.value === customInputValue || opt.label === customInputValue
       );
@@ -196,6 +226,8 @@ const Dropdown: React.FC<DropdownProps> = ({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (readOnly) return;
+    
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       handleToggle();
@@ -207,6 +239,7 @@ const Dropdown: React.FC<DropdownProps> = ({
 
   const getInputState = () => {
     if (disabled) return "disabled";
+    if (readOnly) return "readonly";
     if (variant === "error") return "error";
     if (focused || isOpen) return "focused";
     if (hasValue) return "activated";
@@ -220,6 +253,8 @@ const Dropdown: React.FC<DropdownProps> = ({
     variant,
     isOpen ? "open" : "",
     allowCustomInput ? "custom-input" : "",
+    readOnly ? "readonly" : "",
+    showLabelWithValue ? "label-with-value" : "",
   ].filter(Boolean).join(" ");
 
   const dropdownClass = ["dropdown", inputState, className].join(" ");
@@ -232,17 +267,14 @@ const Dropdown: React.FC<DropdownProps> = ({
       </span>
     );
 
-  // Updated function to handle chip expansion
   const handleShowMoreChips = (e: React.MouseEvent | React.KeyboardEvent) => {
     e.stopPropagation();
     setShowAllChips(!showAllChips);
   };
 
-  // Render chips with expand/collapse functionality in reverse order
   const renderChips = () => {
     if (!multiSelect || selectedValues.length === 0) return null;
 
-    // Reverse the array to show most recent selections first
     const reversedValues = [...selectedValues].reverse();
     
     const shouldShowMoreButton = reversedValues.length > maxChipsToShow;
@@ -256,16 +288,18 @@ const Dropdown: React.FC<DropdownProps> = ({
           return (
             <div className="chip" key={value}>
               {option?.label || value}
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleRemoveChip(value);
-                }}
-                aria-label={`Remove ${option?.label || value}`}
-              >
-                &times;
-              </button>
+              {!readOnly && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRemoveChip(value);
+                  }}
+                  aria-label={`Remove ${option?.label || value}`}
+                >
+                  &times;
+                </button>
+              )}
             </div>
           );
         })}
@@ -293,6 +327,9 @@ const Dropdown: React.FC<DropdownProps> = ({
     );
   };
 
+  // Check if we should show left-inline label functionality
+  const shouldShowLeftInlineLabel = labelPosition === "left-inline" || showLabelWithValue;
+
   return (
     <div className={containerClass} ref={dropdownRef}>
       {label && labelPosition === "external" && (
@@ -304,7 +341,7 @@ const Dropdown: React.FC<DropdownProps> = ({
       )}
 
       <div className="dropdown-wrapper">
-        {label && labelPosition === "internal" && (
+        {label && labelPosition === "internal" && !shouldShowLeftInlineLabel && (
           <label
             htmlFor={name}
             className={`floating-label ${focused || isOpen || hasValue ? "float" : ""}`}
@@ -315,7 +352,7 @@ const Dropdown: React.FC<DropdownProps> = ({
           </label>
         )}
 
-        {label && labelPosition === "middle" && (
+        {label && labelPosition === "middle" && !shouldShowLeftInlineLabel && (
           <label
             htmlFor={name}
             className={`middle-label ${focused || isOpen ? "focused" : ""}`}
@@ -331,44 +368,54 @@ const Dropdown: React.FC<DropdownProps> = ({
             className={dropdownClass}
             onClick={!allowCustomInput ? handleToggle : undefined}
             onKeyDown={!allowCustomInput ? handleKeyDown : undefined}
-            tabIndex={disabled || allowCustomInput ? -1 : 0}
+            tabIndex={disabled || allowCustomInput || readOnly ? -1 : 0}
             role="combobox"
             aria-expanded={isOpen}
             aria-haspopup="listbox"
+            aria-readonly={readOnly}
           >
             <div className="dropdown-content">
-  {multiSelect && selectedValues.length > 0 && renderChips()}
+              {multiSelect && selectedValues.length > 0 && renderChips()}
 
-  {allowCustomInput ? (
-    <input
-      ref={customInputRef}
-      type="text"
-      value={customInputValue}
-      onChange={handleCustomInputChange}
-      onKeyDown={handleCustomInputKeyDown}
-      onFocus={() => setFocused(true)}
-      onBlur={() => setFocused(false)}
-      placeholder={labelPosition === "internal" || labelPosition === "middle" ? "" : placeholder}
-      disabled={disabled}
-      className="custom-input-field"
-    />
-  ) : (
-    <>
-      {!hasValue && (
-        <span className="dropdown-placeholder">
-          {labelPosition === "internal" || labelPosition === "middle" ? "" : placeholder}
-        </span>
-      )}
-      {!multiSelect && hasValue && (
-        <span className="dropdown-value">{getDisplayValue()}</span>
-      )}
-    </>
-  )}
-</div>
-
+              {allowCustomInput ? (
+                <input
+                  ref={customInputRef}
+                  type="text"
+                  value={shouldShowLeftInlineLabel ? 
+                    (customInputValue ? `${label}: ${customInputValue}` : `${label}: `) : 
+                    customInputValue
+                  }
+                  onChange={handleCustomInputChange}
+                  onKeyDown={handleCustomInputKeyDown}
+                  onFocus={() => !readOnly && setFocused(true)}
+                  onBlur={() => setFocused(false)}
+                  placeholder={
+                    shouldShowLeftInlineLabel 
+                      ? (label ? `${label}: ` : placeholder)
+                      : (labelPosition === "internal" || labelPosition === "middle" ? "" : placeholder)
+                  }
+                  disabled={disabled}
+                  readOnly={readOnly}
+                  className="custom-input-field"
+                />
+              ) : (
+                <>
+                  {!hasValue && !shouldShowLeftInlineLabel && (
+                    <span className="dropdown-placeholder">
+                      {labelPosition === "internal" || labelPosition === "middle" 
+                        ? "" 
+                        : placeholder}
+                    </span>
+                  )}
+                  {((!multiSelect && hasValue) || shouldShowLeftInlineLabel) && (
+                    <span className="dropdown-value">{getLeftInlineDisplayValue()}</span>
+                  )}
+                </>
+              )}
+            </div>
 
             <div className="dropdown-icons">
-              {showClearButton && hasValue && !disabled && (
+              {showClearButton && hasValue && !disabled && !readOnly && (
                 <button
                   type="button"
                   className="clear-button"
@@ -378,9 +425,11 @@ const Dropdown: React.FC<DropdownProps> = ({
                   <X size={14} />
                 </button>
               )}
-              <div className="chevron-icon" onClick={allowCustomInput ? handleToggle : undefined}>
-                {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-              </div>
+              {!readOnly && (
+                <div className="chevron-icon" onClick={allowCustomInput ? handleToggle : undefined}>
+                  {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                </div>
+              )}
             </div>
           </div>
 
@@ -399,7 +448,7 @@ const Dropdown: React.FC<DropdownProps> = ({
           )}
         </div>
 
-        {isOpen && (
+        {isOpen && !readOnly && (
           <div className="dropdown-menu" style={{ maxHeight: `${maxHeight}px` }}>
             {searchable && (
               <div className="dropdown-search">
@@ -455,8 +504,6 @@ const Dropdown: React.FC<DropdownProps> = ({
           </div>
         )}
       </div>
-
-      {/* {renderChips()} */}
 
       {showMessage && <div className={`message ${variant}`}>{message}</div>}
     </div>

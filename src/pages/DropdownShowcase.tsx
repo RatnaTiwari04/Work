@@ -5,6 +5,7 @@ const DropdownShowcase = () => {
   const [singleValue, setSingleValue] = useState("");
   const [multiValue, setMultiValue] = useState<string[]>([]);
   const [searchableSingle, setSearchableSingle] = useState("");
+  const [searchableSingleinline, setSearchableSingleInline] = useState("");
   const [searchableMulti, setSearchableMulti] = useState<string[]>([]);
 //   const [internalSingle, setInternalSingle] = useState("");
   const [middleSingle, setMiddleSingle] = useState("");
@@ -83,6 +84,20 @@ const DropdownShowcase = () => {
           options={countryOptions}
           value={searchableSingle}
           onChange={(value) => setSearchableSingle(value as string)}
+          searchable
+          infoTip="Type to search for countries"
+        />
+      </div>
+
+      <div className="form-group">
+        <h3>Searchable Single Select - left inline label</h3>
+        <Dropdown
+          label="Country "
+          labelPosition="left-inline"
+          placeholder="Search for a country"
+          options={countryOptions}
+          value={searchableSingleinline}
+          onChange={(value) => setSearchableSingleInline(value as string)}
           searchable
           infoTip="Type to search for countries"
         />
@@ -181,7 +196,7 @@ const DropdownShowcase = () => {
       <div className="form-group">
         <h3>Custom Max Height</h3>
         <Dropdown
-          label="Limited Height"
+          label="Limited Height "
           labelPosition="external"
           placeholder="Select with custom height"
           options={[
