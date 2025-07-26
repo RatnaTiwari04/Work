@@ -100,6 +100,7 @@ const DropdownShowcase = () => {
           onChange={(value) => setSearchableSingleInline(value as string)}
           searchable
           infoTip="Type to search for countries"
+          showClearButton={false}
         />
       </div>
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { ChevronDown, ChevronUp, X, Info } from "lucide-react";
+import { ChevronDown, ChevronUp, X, Info, Search } from "lucide-react";
 import "./Dropdown.scss";
 
 type Variant = "error" | "warning" | "info" | "success" | "";
@@ -128,17 +128,30 @@ const Dropdown: React.FC<DropdownProps> = ({
   };
 
   // New function to get display value with left-inline label
-  const getLeftInlineDisplayValue = () => {
-    const displayValue = getDisplayValue();
-    if (labelPosition === "left-inline" && label) {
-      return displayValue ? `${label}: ${displayValue}` : `${label}: `;
-    }
-    // Keep backward compatibility with showLabelWithValue
+const getLeftInlineDisplayValue = () => {
+  const displayValue = getDisplayValue();
+  if (labelPosition === "left-inline" && label) {
+    return displayValue ? (
+      <>
+        <span className="label-part">{label}: </span>
+        <span className="value-part">{displayValue}</span>
+      </>
+    ) : (
+      <span className="label-part">{label}: </span>
+    );
+  }
     if (showLabelWithValue && label) {
-      return displayValue ? `${label}: ${displayValue}` : `${label}: `;
-    }
-    return displayValue;
-  };
+    return displayValue ? (
+      <>
+        <span className="label-part">{label}: </span>
+        <span className="value-part">{displayValue}</span>
+      </>
+    ) : (
+      <span className="label-part">{label}: </span>
+    );
+  }
+  return displayValue;
+};
 
   const handleToggle = () => {
     if (disabled || readOnly) return;
@@ -452,6 +465,7 @@ const Dropdown: React.FC<DropdownProps> = ({
           <div className="dropdown-menu" style={{ maxHeight: `${maxHeight}px` }}>
             {searchable && (
               <div className="dropdown-search">
+                <Search size={14} className="search-icon" />
                 <input
                   ref={searchInputRef}
                   type="text"
