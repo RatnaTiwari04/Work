@@ -418,7 +418,6 @@
         }
       }
 
-      // New radio button styles
       .radio {
         display: flex;
         align-items: center;
@@ -428,7 +427,6 @@
           height: 14px;
           margin: 0;
           cursor: pointer;
-          accent-color: $primary-color;
           
           &:focus {
             outline: 2px solid $primary-color;
