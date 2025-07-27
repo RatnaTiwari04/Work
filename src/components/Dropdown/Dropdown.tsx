@@ -9,6 +9,7 @@ interface DropdownOption {
   value: string;
   label: string;
   disabled?: boolean;
+  icon?: React.ReactNode; // New icon property
 }
 
 interface DropdownProps {
@@ -33,6 +34,8 @@ interface DropdownProps {
   showClearButton?: boolean;
   maxChipsToShow?: number;
   showLabelWithValue?: boolean; // Keep this for backward compatibility
+  showRadioButtons?: boolean; // New prop to control radio button visibility
+  showIcons?: boolean; // New prop to control icon visibility in options
 }
 
 const Dropdown: React.FC<DropdownProps> = ({
@@ -57,6 +60,8 @@ const Dropdown: React.FC<DropdownProps> = ({
   showClearButton = true,
   maxChipsToShow = 3,
   showLabelWithValue = false,
+  showRadioButtons = true, // Default to true for single select
+  showIcons = true, // Default to true to show icons
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [focused, setFocused] = useState(false);
@@ -462,7 +467,13 @@ const getLeftInlineDisplayValue = () => {
         </div>
 
         {isOpen && !readOnly && (
-          <div className="dropdown-menu" style={{ maxHeight: `${maxHeight}px` }}>
+          <div 
+            className="dropdown-menu" 
+            style={{ 
+              maxHeight: `${maxHeight}px`,
+              width: '100%'
+            }}
+          >
             {searchable && (
               <div className="dropdown-search">
                 <Search size={14} className="search-icon" />
@@ -498,7 +509,7 @@ const getLeftInlineDisplayValue = () => {
                         : singleValue === option.value
                     }
                   >
-                    {multiSelect && (
+                    {multiSelect ? (
                       <div className="checkbox">
                         <input
                           type="checkbox"
@@ -508,6 +519,24 @@ const getLeftInlineDisplayValue = () => {
                           placeholder={`Select ${option.label}`}
                           title={`Select ${option.label}`}
                         />
+                      </div>
+                    ) : (
+                      showRadioButtons && (
+                        <div className="radio">
+                          <input
+                            type="radio"
+                            name={`${name || 'dropdown'}-radio`}
+                            checked={singleValue === option.value}
+                            onChange={() => {}}
+                            tabIndex={-1}
+                            title={`Select ${option.label}`}
+                          />
+                        </div>
+                      )
+                    )}
+                    {showIcons && option.icon && (
+                      <div className="option-icon">
+                        {option.icon}
                       </div>
                     )}
                     <span className="option-label">{option.label}</span>

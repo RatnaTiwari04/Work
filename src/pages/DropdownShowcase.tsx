@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Dropdown from "../components/Dropdown/Dropdown";
+import { FileText, Image, Video, FileDown, MapPin } from 'lucide-react';
 
 const DropdownShowcase = () => {
   const [singleValue, setSingleValue] = useState("");
@@ -10,6 +11,7 @@ const DropdownShowcase = () => {
 //   const [internalSingle, setInternalSingle] = useState("");
   const [middleSingle, setMiddleSingle] = useState("");
   const [errorValue, setErrorValue] = useState("");
+  const [selectedHeader,setSelectedHeader]=useState("");
 
   const countryOptions = [
     { value: "us", label: "United States" },
@@ -23,6 +25,39 @@ const DropdownShowcase = () => {
     { value: "br", label: "Brazil" },
     { value: "mx", label: "Mexico" },
   ];
+
+  const headerOptions = [
+  {
+    value: 'none',
+    label: 'None',
+    // No icon for this option
+  },
+  {
+    value: 'text',
+    label: 'Text',
+    icon: <FileText size={16} />
+  },
+  {
+    value: 'image',
+    label: 'Image',
+    icon: <Image size={16} />
+  },
+  {
+    value: 'video',
+    label: 'Video',
+    icon: <Video size={16} />
+  },
+  {
+    value: 'document',
+    label: 'Document',
+    icon: <FileDown size={16} />
+  },
+  {
+    value: 'location',
+    label: 'Location',
+    icon: <MapPin size={16} />
+  }
+];
 
   const skillOptions = [
     { value: "js", label: "JavaScript" },
@@ -102,6 +137,19 @@ const DropdownShowcase = () => {
           infoTip="Type to search for countries"
           showClearButton={false}
         />
+      </div>
+
+     <div className="form-group">
+       <h3>icons</h3>
+      <Dropdown
+       label="Header (Optional)"
+       placeholder="Select header type"
+       value={selectedHeader}
+       onChange={(value) => setSelectedHeader(value as string)}
+       options={headerOptions}
+       showRadioButtons={true}  // Show radio buttons
+       showIcons={true}         // Show icons
+      />
       </div>
 
       <div className="form-group">
