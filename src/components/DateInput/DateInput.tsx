@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Calendar, Info, ChevronLeft, ChevronRight } from "lucide-react";
+import { Calendar, Info, ChevronLeft, ChevronRight, Clock } from "lucide-react";
 import "./DateInput.scss";
 
 type Variant = "error" | "warning" | "info" | "success" | "";
 type LabelPosition = "internal" | "external" | "middle";
 type DateFormat = "MM/DD/YYYY" | "DD/MM/YYYY" | "YYYY-MM-DD";
+type TimeFormat = "12" | "24";
 
 interface DateInputProps {
   label?: string;
@@ -32,6 +33,11 @@ interface DateInputProps {
   firstDayOfWeek?: 0 | 1;
   yearRange?: [number, number];
   quickDateOptions?: { label: string; value: string }[];
+  // New time-related props
+  showTime?: boolean;
+  timeFormat?: TimeFormat;
+  minuteStep?: number;
+  defaultTime?: string; // Format: "HH:mm" or "HH:mm AM/PM"
 }
 
 const DateInput: React.FC<DateInputProps> = ({
@@ -58,6 +64,11 @@ const DateInput: React.FC<DateInputProps> = ({
   disabledDates = [],
   enabledDatesOnly = [],
   quickDateOptions = [],
+  // New time-related props
+  showTime = false,
+  timeFormat = "12",
+  minuteStep = 1,
+  defaultTime = "12:00 AM",
 }) => {
   const [focused, setFocused] = useState(false);
   const [touched, setTouched] = useState(false);
@@ -66,18 +77,31 @@ const DateInput: React.FC<DateInputProps> = ({
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [inputError, setInputError] = useState("");
+  
+  // Time-related state
+  const [selectedHour, setSelectedHour] = useState(12);
+  const [selectedMinute, setSelectedMinute] = useState(0);
+  const [selectedPeriod, setSelectedPeriod] = useState<"AM" | "PM">("AM");
 
   const dateInputRef = useRef<HTMLInputElement>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setInputValue(value);
-    if (value && isValidDate(value)) {
-      setSelectedDate(parseDate(value));
+    if (value) {
+      if (showTime) {
+        parseDateTime(value);
+      } else if (isValidDate(value)) {
+        setSelectedDate(parseDate(value));
+      }
     } else {
       setSelectedDate(null);
+      // Set default time
+      if (showTime && defaultTime) {
+        parseTimeString(defaultTime);
+      }
     }
-  }, [value]);
+  }, [value, showTime, defaultTime]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -94,7 +118,74 @@ const DateInput: React.FC<DateInputProps> = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const getPlaceholder = () => placeholder || dateFormat.toLowerCase();
+  const getPlaceholder = () => {
+    if (placeholder) return placeholder;
+    if (showTime) {
+      const timeFormat12 = timeFormat === "12" ? " hh:mm AM/PM" : " HH:mm";
+      return dateFormat.toLowerCase() + timeFormat12;
+    }
+    return dateFormat.toLowerCase();
+  };
+
+  const parseTimeString = (timeStr: string) => {
+    const timeRegex12 = /^(\d{1,2}):(\d{2})\s*(AM|PM)$/i;
+    const timeRegex24 = /^(\d{1,2}):(\d{2})$/;
+    
+    if (timeFormat === "12") {
+      const match = timeStr.match(timeRegex12);
+      if (match) {
+        const hour = parseInt(match[1], 10);
+        const minute = parseInt(match[2], 10);
+        const period = match[3].toUpperCase() as "AM" | "PM";
+        
+        setSelectedHour(hour);
+        setSelectedMinute(minute);
+        setSelectedPeriod(period);
+      }
+    } else {
+      const match = timeStr.match(timeRegex24);
+      if (match) {
+        const hour = parseInt(match[1], 10);
+        const minute = parseInt(match[2], 10);
+        
+        setSelectedHour(hour);
+        setSelectedMinute(minute);
+      }
+    }
+  };
+
+  const parseDateTime = (dateTimeStr: string) => {
+    // Split date and time parts
+    const parts = dateTimeStr.split(' ');
+    if (parts.length >= 1) {
+      const datePart = parts[0];
+      if (isValidDate(datePart)) {
+        setSelectedDate(parseDate(datePart));
+      }
+      
+      if (parts.length > 1 && showTime) {
+        const timePart = parts.slice(1).join(' ');
+        parseTimeString(timePart);
+      }
+    }
+  };
+
+  const formatTime = (): string => {
+    if (timeFormat === "12") {
+      const displayHour = selectedHour === 0 ? 12 : selectedHour;
+      return `${displayHour.toString().padStart(2, '0')}:${selectedMinute.toString().padStart(2, '0')} ${selectedPeriod}`;
+    } else {
+      return `${selectedHour.toString().padStart(2, '0')}:${selectedMinute.toString().padStart(2, '0')}`;
+    }
+  };
+
+  const formatDateTime = (date: Date): string => {
+    const dateStr = formatDate(date);
+    if (showTime) {
+      return `${dateStr} ${formatTime()}`;
+    }
+    return dateStr;
+  };
 
   const formatDate = (date: Date): string => {
     const day = date.getDate().toString().padStart(2, '0');
@@ -179,14 +270,29 @@ const DateInput: React.FC<DateInputProps> = ({
       setInputError("");
       return;
     }
-    if (!isValidDate(inputValue)) {
-      setInputError("Invalid date format");
-      return;
-    }
-    const date = parseDate(inputValue);
-    if (date && isDateDisabled(date)) {
-      setInputError("This date is not available");
-      return;
+    
+    if (showTime) {
+      // For date-time validation, extract date part
+      const datePart = inputValue.split(' ')[0];
+      if (!isValidDate(datePart)) {
+        setInputError("Invalid date format");
+        return;
+      }
+      const date = parseDate(datePart);
+      if (date && isDateDisabled(date)) {
+        setInputError("This date is not available");
+        return;
+      }
+    } else {
+      if (!isValidDate(inputValue)) {
+        setInputError("Invalid date format");
+        return;
+      }
+      const date = parseDate(inputValue);
+      if (date && isDateDisabled(date)) {
+        setInputError("This date is not available");
+        return;
+      }
     }
     setInputError("");
   };
@@ -196,12 +302,24 @@ const DateInput: React.FC<DateInputProps> = ({
     setInputValue(newValue);
 
     if (allowManualInput) {
-      if (isValidDate(newValue)) {
-        const date = parseDate(newValue);
-        if (date && !isDateDisabled(date)) {
-          setSelectedDate(date);
-          setCurrentMonth(date);
-          onChange?.(newValue);
+      if (showTime) {
+        const datePart = newValue.split(' ')[0];
+        if (isValidDate(datePart)) {
+          const date = parseDate(datePart);
+          if (date && !isDateDisabled(date)) {
+            setSelectedDate(date);
+            setCurrentMonth(date);
+            onChange?.(newValue);
+          }
+        }
+      } else {
+        if (isValidDate(newValue)) {
+          const date = parseDate(newValue);
+          if (date && !isDateDisabled(date)) {
+            setSelectedDate(date);
+            setCurrentMonth(date);
+            onChange?.(newValue);
+          }
         }
       }
     }
@@ -215,13 +333,41 @@ const DateInput: React.FC<DateInputProps> = ({
 
   const handleDateSelect = (date: Date) => {
     if (isDateDisabled(date)) return;
-    const formattedDate = formatDate(date);
+    
     setSelectedDate(date);
     setCurrentMonth(date);
-    setInputValue(formattedDate);
-    onChange?.(formattedDate);
-    setShowDatePicker(false);
+    
+    const formattedValue = showTime ? formatDateTime(date) : formatDate(date);
+    setInputValue(formattedValue);
+    onChange?.(formattedValue);
+    
+    if (!showTime) {
+      setShowDatePicker(false);
+    }
     setInputError("");
+  };
+
+  const handleTimeChange = () => {
+    if (selectedDate) {
+      const formattedValue = formatDateTime(selectedDate);
+      setInputValue(formattedValue);
+      onChange?.(formattedValue);
+    }
+  };
+
+  const handleHourChange = (hour: number) => {
+    setSelectedHour(hour);
+    setTimeout(handleTimeChange, 0);
+  };
+
+  const handleMinuteChange = (minute: number) => {
+    setSelectedMinute(minute);
+    setTimeout(handleTimeChange, 0);
+  };
+
+  const handlePeriodChange = (period: "AM" | "PM") => {
+    setSelectedPeriod(period);
+    setTimeout(handleTimeChange, 0);
   };
 
   const handleQuickDateSelect = (dateValue: string) => {
@@ -272,6 +418,22 @@ const DateInput: React.FC<DateInputProps> = ({
     return days;
   };
 
+  const generateHours = () => {
+    if (timeFormat === "12") {
+      return Array.from({ length: 12 }, (_, i) => i + 1);
+    } else {
+      return Array.from({ length: 24 }, (_, i) => i);
+    }
+  };
+
+  const generateMinutes = () => {
+    const minutes = [];
+    for (let i = 0; i < 60; i += minuteStep) {
+      minutes.push(i);
+    }
+    return minutes;
+  };
+
   const getDayClasses = (date: Date): string => {
     const classes = ["calendar-day"];
     const today = new Date();
@@ -306,6 +468,7 @@ const DateInput: React.FC<DateInputProps> = ({
     labelPosition ? `label-${labelPosition}` : "",
     variant,
     inputError ? "error" : "",
+    showTime ? "with-time" : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -371,7 +534,7 @@ const DateInput: React.FC<DateInputProps> = ({
 
           {showCalendar && (
             <div className="calendar-icon" onClick={handleCalendarClick}>
-              <Calendar size={16} />
+              {showTime ? <Clock size={16} /> : <Calendar size={16} />}
             </div>
           )}
 
@@ -432,7 +595,7 @@ const DateInput: React.FC<DateInputProps> = ({
 
             <div className="calendar-grid">
               <div className="calendar-header">
-                {["S", "M", "T", "W", "T", "F", "S"].map((day, index) => (
+                {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day, index) => (
                   <div key={index} className="day-header">
                     {day}
                   </div>
@@ -452,6 +615,67 @@ const DateInput: React.FC<DateInputProps> = ({
                 ))}
               </div>
             </div>
+
+            {showTime && (
+              <div className="time-picker">
+                <div className="time-picker-header">
+                  <Clock size={16} />
+                  <span>Select Time</span>
+                </div>
+                <div className="time-controls">
+                  <div className="time-control">
+                    <label>
+                      {timeFormat === "12" ? "Hour" : "Hour"}
+                    </label>
+                    <select
+                      value={selectedHour}
+                      onChange={(e) => handleHourChange(Number(e.target.value))}
+                      className="time-select"
+                    >
+                      {generateHours().map((hour) => (
+                        <option key={hour} value={hour}>
+                          {timeFormat === "12" ? hour : hour.toString().padStart(2, '0')}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div className="time-separator">:</div>
+                  
+                  <div className="time-control">
+                    <label>Minute</label>
+                    <select
+                      value={selectedMinute}
+                      onChange={(e) => handleMinuteChange(Number(e.target.value))}
+                      className="time-select"
+                    >
+                      {generateMinutes().map((minute) => (
+                        <option key={minute} value={minute}>
+                          {minute.toString().padStart(2, '0')}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {timeFormat === "12" && (
+                    <>
+                      <div className="time-separator"></div>
+                      <div className="time-control">
+                        <label>Period</label>
+                        <select
+                          value={selectedPeriod}
+                          onChange={(e) => handlePeriodChange(e.target.value as "AM" | "PM")}
+                          className="time-select"
+                        >
+                          <option value="AM">AM</option>
+                          <option value="PM">PM</option>
+                        </select>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

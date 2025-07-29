@@ -31,11 +31,13 @@ const DropdownShowcase = () => {
     value: 'none',
     label: 'None',
     // No icon for this option
+    // disabled: true
   },
   {
     value: 'text',
     label: 'Text',
     icon: <FileText size={16} />
+    
   },
   {
     value: 'image',
@@ -148,7 +150,7 @@ const DropdownShowcase = () => {
        onChange={(value) => setSelectedHeader(value as string)}
        options={headerOptions}
        showRadioButtons={true}  // Show radio buttons
-       showIcons={true}         // Show icons
+       showIcons={true}        // Show icons
       />
       </div>
 

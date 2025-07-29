@@ -16,6 +16,14 @@ const DateInputShowcase = () => {
   const [differentFormat, setDifferentFormat] = useState("");
   const [withMinMax, setWithMinMax] = useState("");
   
+  // New time-related state variables
+  const [dateTime12, setDateTime12] = useState("");
+  const [dateTime24, setDateTime24] = useState("");
+  const [appointmentDateTime, setAppointmentDateTime] = useState("");
+  const [meetingDateTime, setMeetingDateTime] = useState("");
+  const [eventStartTime, setEventStartTime] = useState("");
+  const [eventEndTime, setEventEndTime] = useState("");
+  
   const focusedInputRef = useRef<HTMLInputElement>(null);
   // const navigate = useNavigate();
 
@@ -33,6 +41,13 @@ const DateInputShowcase = () => {
     { label: "Tomorrow", value: new Date(Date.now() + 24 * 60 * 60 * 1000).toLocaleDateString('en-US') },
     { label: "Next Week", value: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US') },
     { label: "Next Month", value: new Date(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()).toLocaleDateString('en-US') }
+  ];
+
+  // Quick datetime options for time-enabled inputs
+  const quickDateTimeOptions = [
+    { label: "Now", value: `${new Date().toLocaleDateString('en-US')} ${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}` },
+    { label: "Tomorrow 9 AM", value: `${new Date(Date.now() + 24 * 60 * 60 * 1000).toLocaleDateString('en-US')} 09:00 AM` },
+    { label: "Next Week 2 PM", value: `${new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US')} 02:00 PM` }
   ];
 
   const disabledDates = [
@@ -65,6 +80,111 @@ const DateInputShowcase = () => {
         />
       </div>
 
+      {/* NEW TIME PICKER EXAMPLES */}
+      <div className="form-group">
+        <h3>DateTime Picker (12-hour format)</h3>
+        <DateInput
+          label="Meeting Date & Time"
+          value={dateTime12}
+          onChange={setDateTime12}
+          placeholder="Select date and time"
+          labelPosition="external"
+          showTime={true}
+          timeFormat="12"
+          defaultTime="09:00 AM"
+          infoTip="Choose meeting date and time (12-hour format)"
+          highlightToday
+        />
+      </div>
+
+      <div className="form-group">
+        <h3>DateTime Picker (24-hour format)</h3>
+        <DateInput
+          label="Event Schedule"
+          value={dateTime24}
+          onChange={setDateTime24}
+          placeholder="Select date and time"
+          labelPosition="external"
+          showTime={true}
+          timeFormat="24"
+          defaultTime="14:00"
+          dateFormat="DD/MM/YYYY"
+          infoTip="Choose event date and time (24-hour format)"
+          variant="info"
+          message="Using European date format with 24-hour time"
+        />
+      </div>
+
+      <div className="form-group">
+        <h3>Appointment Booking with Time</h3>
+        <DateInput
+          label="Appointment Date & Time"
+          value={appointmentDateTime}
+          onChange={setAppointmentDateTime}
+          placeholder="Book your appointment"
+          labelPosition="internal"
+          showTime={true}
+          timeFormat="12"
+          minuteStep={15}
+          quickDateOptions={quickDateTimeOptions}
+          infoTip="Book appointment with 15-minute intervals"
+          highlightToday
+          highlightWeekends
+          required
+        />
+      </div>
+
+      <div className="form-group">
+        <h3>Meeting Scheduler</h3>
+        <DateInput
+          label="Meeting Time"
+          value={meetingDateTime}
+          onChange={setMeetingDateTime}
+          placeholder="Schedule meeting"
+          labelPosition="middle"
+          showTime={true}
+          timeFormat="12"
+          minDate={new Date().toLocaleDateString('en-US')}
+          infoTip="Schedule meeting for future dates only"
+          variant="success"
+          message="Available for booking"
+        />
+      </div>
+
+      <div className="form-row">
+        <div className="form-group">
+          <h3>Event Start Time</h3>
+          <DateInput
+            label="Start Date & Time"
+            value={eventStartTime}
+            onChange={setEventStartTime}
+            placeholder="Event start"
+            labelPosition="external"
+            showTime={true}
+            timeFormat="12"
+            variant="info"
+            message="Select the event start time"
+          />
+        </div>
+        
+        <div className="form-group">
+          <h3>Event End Time</h3>
+          <DateInput
+            label="End Date & Time"
+            value={eventEndTime}
+            onChange={setEventEndTime}
+            placeholder="Event end"
+            labelPosition="external"
+            showTime={true}
+            timeFormat="12"
+            minDate={eventStartTime ? eventStartTime.split(' ')[0] : undefined}
+            variant="info"
+            message="Select the event end time"
+          />
+        </div>
+      </div>
+
+      {/* EXISTING EXAMPLES CONTINUE */}
       <div className="form-group">
         <h3>Internal Label</h3>
         <DateInput

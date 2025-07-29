@@ -81,6 +81,12 @@ $variants: (
   position: relative;
   width: 100%;
 
+  &.with-time {
+    .date-picker {
+      min-width: 300px;
+    }
+  }
+
   &.label-external {
     .date-input-label {
       display: block;
@@ -180,7 +186,7 @@ $variants: (
     border-color: $border-color;
 
     &:hover:not(:disabled) {
-      border-color: darken($border-color, 10%);
+      border-color: color.adjust($border-color, $lightness: -10%);
     }
   }
 
@@ -189,7 +195,7 @@ $variants: (
   }
 
   &.activated {
-    border-color: darken($border-color, 10%);
+    color: color.adjust($disabled-color, $lightness: 10%);
   }
 
   &.disabled {
@@ -278,7 +284,7 @@ $variants: (
   &:hover .tooltip {
     opacity: 1;
     visibility: visible;
-transition-delay: 0s !important;
+    transition-delay: 0s !important;
   }
 }
 
@@ -378,20 +384,19 @@ transition-delay: 0s !important;
     padding: 12px 16px;
 
     .calendar-header {
-      grid-template-columns: repeat(7, 1fr);
-      gap: 2px;
-      margin-bottom: 8px;
       display: flex;
       justify-content: space-around;
-     align-items: center;
-    flex-wrap: nowrap;
+      align-items: center;
+      flex-wrap: nowrap;
+      margin-bottom: 8px;
 
-      .week-header {
+      .day-header {
         font-size: 0.75rem;
         font-weight: 500;
         color: $text-color;
         text-align: center;
         padding: 4px;
+        min-width: 32px;
       }
     }
 
@@ -452,6 +457,73 @@ transition-delay: 0s !important;
       }
     }
   }
+
+  // Time Picker Styles
+  .time-picker {
+    border-top: 1px solid $border-color;
+    padding: 16px;
+    background: $white;
+
+    .time-picker-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
+      color: $text-color;
+      font-size: 0.875rem;
+    }
+
+    .time-controls {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      justify-content: center;
+
+      .time-control {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 60px;
+
+        label {
+          font-size: 0.75rem;
+          color: $text-color;
+          margin-bottom: 4px;
+          font-weight: 500;
+        }
+
+        .time-select {
+          width: 100%;
+          padding: 6px 8px;
+          border: 1px solid $border-color;
+          border-radius: 4px;
+          font-size: 0.875rem;
+          background: $white;
+          color: $text-color;
+          cursor: pointer;
+          transition: $transition;
+
+          &:focus {
+            outline: none;
+            border-color: $primary-color;
+            box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+          }
+
+          &:hover {
+            border-color: darken($border-color, 10%);
+          }
+        }
+      }
+
+      .time-separator {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: $text-color;
+        padding: 0 4px;
+        margin-bottom: 8px;
+      }
+    }
+  }
 }
 
 .form-showcase {
@@ -477,8 +549,30 @@ transition-delay: 0s !important;
   .date-picker {
     .date-picker-header,
     .calendar-grid,
-    .quick-dates {
+    .quick-dates,
+    .time-picker {
       padding: 8px 12px;
+    }
+
+    .time-picker {
+      .time-controls {
+        flex-wrap: wrap;
+        gap: 6px;
+
+        .time-control {
+          min-width: 50px;
+        }
+      }
+    }
+  }
+
+  .date-input-container {
+    &.with-time {
+      .date-picker {
+        left: -50px;
+        right: -50px;
+        min-width: auto;
+      }
     }
   }
 }
