@@ -24,6 +24,98 @@
   }
 }
 .dropdown-container {
+  &.with-side-content {
+    .dropdown-value {
+      width: 100%;
+      
+      .side-content-display {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        
+        .left-content {
+          font-weight: 500;
+          color: #333;
+          flex: 1;
+          text-align: left;
+          overflow: hidden;          // Add this
+          text-overflow: ellipsis;   // Add this
+          white-space: nowrap;       // Add this
+        }
+        
+        .right-content {
+          font-weight: 400;
+          color: #666;
+          font-size: 13px;
+          flex-shrink: 0;
+          text-align: right;
+          margin-left: 8px;
+          overflow: hidden;          // Add this
+          text-overflow: ellipsis;   // Add this
+          white-space: nowrap;       // Add this
+        }
+      }
+    }
+  }
+  .dropdown-menu {
+    .dropdown-option {
+      // Add this new section for side content in options
+      &.with-side-content {
+        .option-content-wrapper {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          width: 100%;
+          flex: 1;
+
+          .option-left-content {
+            font-weight: 500;
+            color: #333;
+            flex: 1;
+            text-align: left;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+
+          .option-right-content {
+            font-weight: 400;
+            color: #666;
+            font-size: 13px;
+            flex-shrink: 0;
+            text-align: right;
+            margin-left: 8px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+
+          .option-label {
+            font-weight: 500;
+            color: #333;
+            flex: 1;
+            text-align: left;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+        }
+      }
+
+      // Add icon styling
+      .option-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+      }
+    }
+  }
+}
+.dropdown-container {
   display: flex;
   flex-direction: column;
   position: relative;

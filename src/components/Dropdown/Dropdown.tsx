@@ -9,7 +9,9 @@ interface DropdownOption {
   value: string;
   label: string;
   disabled?: boolean;
-  icon?: React.ReactNode; // New icon property
+  icon?: React.ReactNode;
+  leftSideContent?: string;
+  rightSideContent?: string;
 }
 
 interface DropdownProps {
@@ -33,9 +35,11 @@ interface DropdownProps {
   maxHeight?: number;
   showClearButton?: boolean;
   maxChipsToShow?: number;
-  showLabelWithValue?: boolean; // Keep this for backward compatibility
-  showRadioButtons?: boolean; // New prop to control radio button visibility
-  showIcons?: boolean; // New prop to control icon visibility in options
+  showLabelWithValue?: boolean;
+  showRadioButtons?: boolean;
+  showIcons?: boolean;
+  showSideContent?: boolean;
+  sideContentPosition?: "left" | "right" | "both";
 }
 
 const Dropdown: React.FC<DropdownProps> = ({
@@ -60,8 +64,10 @@ const Dropdown: React.FC<DropdownProps> = ({
   showClearButton = true,
   maxChipsToShow = 3,
   showLabelWithValue = false,
-  showRadioButtons = true, // Default to true for single select
-  showIcons = true, // Default to true to show icons
+  showRadioButtons = true,
+  showIcons = true,
+  showSideContent = false,
+  sideContentPosition = "right",
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [focused, setFocused] = useState(false);
@@ -71,7 +77,6 @@ const Dropdown: React.FC<DropdownProps> = ({
   const [singleValue, setSingleValue] = useState<string>("");
   const [customInputValue, setCustomInputValue] = useState<string>("");
   const [showAllChips, setShowAllChips] = useState(false);
-  
   
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -107,7 +112,9 @@ const Dropdown: React.FC<DropdownProps> = ({
 
   const filteredOptions = options.filter(option =>
     option.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    option.value.toLowerCase().includes(searchTerm.toLowerCase())
+    option.value.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (option.leftSideContent && option.leftSideContent.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (option.rightSideContent && option.rightSideContent.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const getDisplayValue = () => {
@@ -132,31 +139,75 @@ const Dropdown: React.FC<DropdownProps> = ({
     }
   };
 
-  // New function to get display value with left-inline label
-const getLeftInlineDisplayValue = () => {
-  const displayValue = getDisplayValue();
-  if (labelPosition === "left-inline" && label) {
-    return displayValue ? (
-      <>
+  // Fixed function to get display value with side content
+  const getDisplayValueWithSideContent = () => {
+    // For multiSelect, don't show side content in the main display
+    if (multiSelect) {
+      return getLeftInlineDisplayValue();
+    }
+
+    const selectedOption = options.find(opt => opt.value === singleValue);
+    
+    if (!selectedOption || !singleValue) {
+      return getLeftInlineDisplayValue();
+    }
+
+    // Handle side content display
+    if (showSideContent) {
+      const leftContent = selectedOption.leftSideContent;
+      const rightContent = selectedOption.rightSideContent;
+
+      if (sideContentPosition === "both" && leftContent && rightContent) {
+        return (
+          <div className="side-content-display">
+            <span className="left-content">{leftContent}</span>
+            <span className="right-content">{rightContent}</span>
+          </div>
+        );
+      } else if (sideContentPosition === "left" && leftContent) {
+        return (
+          <div className="side-content-display">
+            <span className="left-content">{leftContent}</span>
+          </div>
+        );
+      } else if (sideContentPosition === "right" && rightContent) {
+        return (
+          <div className="side-content-display">
+            <span className="left-content">{selectedOption.label}</span>
+            <span className="right-content">{rightContent}</span>
+          </div>
+        );
+      }
+    }
+
+    return getLeftInlineDisplayValue();
+  };
+
+  // Original function for left-inline label
+  const getLeftInlineDisplayValue = () => {
+    const displayValue = getDisplayValue();
+    if (labelPosition === "left-inline" && label) {
+      return displayValue ? (
+        <>
+          <span className="label-part">{label}: </span>
+          <span className="value-part">{displayValue}</span>
+        </>
+      ) : (
         <span className="label-part">{label}: </span>
-        <span className="value-part">{displayValue}</span>
-      </>
-    ) : (
-      <span className="label-part">{label}: </span>
-    );
-  }
+      );
+    }
     if (showLabelWithValue && label) {
-    return displayValue ? (
-      <>
+      return displayValue ? (
+        <>
+          <span className="label-part">{label}: </span>
+          <span className="value-part">{displayValue}</span>
+        </>
+      ) : (
         <span className="label-part">{label}: </span>
-        <span className="value-part">{displayValue}</span>
-      </>
-    ) : (
-      <span className="label-part">{label}: </span>
-    );
-  }
-  return displayValue;
-};
+      );
+    }
+    return displayValue;
+  };
 
   const handleToggle = () => {
     if (disabled || readOnly) return;
@@ -273,6 +324,7 @@ const getLeftInlineDisplayValue = () => {
     allowCustomInput ? "custom-input" : "",
     readOnly ? "readonly" : "",
     showLabelWithValue ? "label-with-value" : "",
+    showSideContent ? "with-side-content" : "",
   ].filter(Boolean).join(" ");
 
   const dropdownClass = ["dropdown", inputState, className].join(" ");
@@ -426,7 +478,9 @@ const getLeftInlineDisplayValue = () => {
                     </span>
                   )}
                   {((!multiSelect && hasValue) || shouldShowLeftInlineLabel) && (
-                    <span className="dropdown-value">{getLeftInlineDisplayValue()}</span>
+                    <span className="dropdown-value">
+                      {showSideContent ? getDisplayValueWithSideContent() : getLeftInlineDisplayValue()}
+                    </span>
                   )}
                 </>
               )}
@@ -500,7 +554,9 @@ const getLeftInlineDisplayValue = () => {
                       multiSelect
                         ? selectedValues.includes(option.value) ? "selected" : ""
                         : singleValue === option.value ? "selected" : ""
-                    } ${option.disabled ? "disabled" : ""}`}
+                    } ${option.disabled ? "disabled" : ""} ${
+                      showSideContent ? "with-side-content" : ""
+                    }`}
                     onClick={() => !option.disabled && handleOptionClick(option.value)}
                     role="option"
                     aria-selected={
@@ -534,12 +590,28 @@ const getLeftInlineDisplayValue = () => {
                         </div>
                       )
                     )}
+                    
                     {showIcons && option.icon && (
                       <div className="option-icon">
                         {option.icon}
                       </div>
                     )}
-                    <span className="option-label">{option.label}</span>
+                    
+                    {showSideContent ? (
+                      <div className="option-content-wrapper">
+                        {(sideContentPosition === "left" || sideContentPosition === "both") && option.leftSideContent ? (
+                          <span className="option-left-content">{option.leftSideContent}</span>
+                        ) : (
+                          <span className="option-label">{option.label}</span>
+                        )}
+                        
+                        {(sideContentPosition === "right" || sideContentPosition === "both") && option.rightSideContent && (
+                          <span className="option-right-content">{option.rightSideContent}</span>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="option-label">{option.label}</span>
+                    )}
                   </div>
                 ))
               )}

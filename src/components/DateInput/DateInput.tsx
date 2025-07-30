@@ -6,6 +6,7 @@ type Variant = "error" | "warning" | "info" | "success" | "";
 type LabelPosition = "internal" | "external" | "middle";
 type DateFormat = "MM/DD/YYYY" | "DD/MM/YYYY" | "YYYY-MM-DD";
 type TimeFormat = "12" | "24";
+type PickerView = "calendar" | "month" | "year";
 
 interface DateInputProps {
   label?: string;
@@ -63,6 +64,7 @@ const DateInput: React.FC<DateInputProps> = ({
   highlightWeekends = false,
   disabledDates = [],
   enabledDatesOnly = [],
+  yearRange,
   quickDateOptions = [],
   // New time-related props
   showTime = false,
@@ -77,6 +79,7 @@ const DateInput: React.FC<DateInputProps> = ({
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [inputError, setInputError] = useState("");
+  const [pickerView, setPickerView] = useState<PickerView>("calendar");
   
   // Time-related state
   const [selectedHour, setSelectedHour] = useState(12);
@@ -85,6 +88,13 @@ const DateInput: React.FC<DateInputProps> = ({
 
   const dateInputRef = useRef<HTMLInputElement>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
+
+  // Calculate year range with defaults
+  const getYearRange = (): [number, number] => {
+    if (yearRange) return yearRange;
+    const currentYear = new Date().getFullYear();
+    return [currentYear - 100, currentYear + 10];
+  };
 
   useEffect(() => {
     setInputValue(value);
@@ -112,6 +122,7 @@ const DateInput: React.FC<DateInputProps> = ({
         !dateInputRef.current.contains(event.target as Node)
       ) {
         setShowDatePicker(false);
+        setPickerView("calendar");
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -343,6 +354,7 @@ const DateInput: React.FC<DateInputProps> = ({
     
     if (!showTime) {
       setShowDatePicker(false);
+      setPickerView("calendar");
     }
     setInputError("");
   };
@@ -379,6 +391,22 @@ const DateInput: React.FC<DateInputProps> = ({
     }
   };
 
+  const handleMonthYearClick = () => {
+    setPickerView(pickerView === "calendar" ? "month" : pickerView === "month" ? "year" : "calendar");
+  };
+
+  const handleMonthSelect = (month: number) => {
+    const newDate = new Date(currentMonth.getFullYear(), month, 1);
+    setCurrentMonth(newDate);
+    setPickerView("calendar");
+  };
+
+  const handleYearSelect = (year: number) => {
+    const newDate = new Date(year, currentMonth.getMonth(), 1);
+    setCurrentMonth(newDate);
+    setPickerView("month");
+  };
+
   const navigateMonth = (direction: "prev" | "next") => {
     const newMonth = new Date(currentMonth);
     direction === "prev"
@@ -392,6 +420,13 @@ const DateInput: React.FC<DateInputProps> = ({
     direction === "prev"
       ? newMonth.setFullYear(newMonth.getFullYear() - 1)
       : newMonth.setFullYear(newMonth.getFullYear() + 1);
+    setCurrentMonth(newMonth);
+  };
+
+  const navigateYearInYearView = (direction: "prev" | "next") => {
+    const newMonth = new Date(currentMonth);
+    const increment = direction === "prev" ? -12 : 12;
+    newMonth.setFullYear(newMonth.getFullYear() + increment);
     setCurrentMonth(newMonth);
   };
 
@@ -416,6 +451,34 @@ const DateInput: React.FC<DateInputProps> = ({
     }
 
     return days;
+  };
+
+  const generateMonths = () => {
+    const months = [];
+    for (let i = 0; i < 12; i++) {
+      const date = new Date(currentMonth.getFullYear(), i, 1);
+      months.push({
+        index: i,
+        name: date.toLocaleDateString("en-US", { month: "short" }),
+        fullName: date.toLocaleDateString("en-US", { month: "long" })
+      });
+    }
+    return months;
+  };
+
+  const generateYears = () => {
+    const [minYear, maxYear] = getYearRange();
+    const currentYear = currentMonth.getFullYear();
+    const startYear = Math.floor((currentYear - minYear) / 12) * 12 + minYear;
+    const years = [];
+    
+    for (let i = 0; i < 12; i++) {
+      const year = startYear + i;
+      if (year >= minYear && year <= maxYear) {
+        years.push(year);
+      }
+    }
+    return years;
   };
 
   const generateHours = () => {
@@ -480,6 +543,78 @@ const DateInput: React.FC<DateInputProps> = ({
         <div className="tooltip">{infoTip}</div>
       </span>
     );
+
+  const renderCalendarView = () => (
+    <>
+      {quickDateOptions.length > 0 && (
+        <div className="quick-dates">
+          {quickDateOptions.map((option, index) => (
+            <button
+              key={index}
+              type="button"
+              className="quick-date-button"
+              onClick={() => handleQuickDateSelect(option.value)}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <div className="calendar-grid">
+        <div className="calendar-header">
+          {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day, index) => (
+            <div key={index} className="day-header">
+              {day}
+            </div>
+          ))}
+        </div>
+        <div className="calendar-body">
+          {generateCalendarDays().map((date, index) => (
+            <button
+              key={index}
+              type="button"
+              className={getDayClasses(date)}
+              onClick={() => handleDateSelect(date)}
+              disabled={isDateDisabled(date)}
+            >
+              {date.getDate()}
+            </button>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+
+  const renderMonthView = () => (
+    <div className="month-grid">
+      {generateMonths().map((month) => (
+        <button
+          key={month.index}
+          type="button"
+          className={`month-item ${currentMonth.getMonth() === month.index ? 'selected' : ''}`}
+          onClick={() => handleMonthSelect(month.index)}
+        >
+          {month.name}
+        </button>
+      ))}
+    </div>
+  );
+
+  const renderYearView = () => (
+    <div className="year-grid">
+      {generateYears().map((year) => (
+        <button
+          key={year}
+          type="button"
+          className={`year-item ${currentMonth.getFullYear() === year ? 'selected' : ''}`}
+          onClick={() => handleYearSelect(year)}
+        >
+          {year}
+        </button>
+      ))}
+    </div>
+  );
 
   const showMessage = (touched && variant && message) || inputError;
   const displayMessage = inputError || message;
@@ -557,66 +692,61 @@ const DateInput: React.FC<DateInputProps> = ({
           <div ref={calendarRef} className="date-picker">
             <div className="date-picker-header">
               <div className="navigation">
-                <button onClick={() => navigateYear("prev")} className="nav-button" title="Previous Year">
+                <button 
+                  onClick={() => pickerView === "year" ? navigateYearInYearView("prev") : navigateYear("prev")} 
+                  className="nav-button" 
+                  title={pickerView === "year" ? "Previous Years" : "Previous Year"}
+                >
                   <ChevronLeft size={14} />
                 </button>
-                <button onClick={() => navigateMonth("prev")} className="nav-button" title="Previous Month">
-                  <ChevronLeft size={12} />
+                {pickerView === "calendar" && (
+                  <button 
+                    onClick={() => navigateMonth("prev")} 
+                    className="nav-button" 
+                    title="Previous Month"
+                  >
+                    <ChevronLeft size={12} />
+                  </button>
+                )}
+                <button 
+                  className="month-year-selector" 
+                  onClick={handleMonthYearClick}
+                  title="Select Month/Year"
+                >
+                  {pickerView === "year" 
+                    ? `${generateYears()[0]} - ${generateYears()[generateYears().length - 1]}`
+                    : pickerView === "month"
+                    ? currentMonth.getFullYear().toString()
+                    : currentMonth.toLocaleDateString("en-US", {
+                        month: "long",
+                        year: "numeric",
+                      })
+                  }
                 </button>
-                <div className="month-year">
-                  {currentMonth.toLocaleDateString("en-US", {
-                    month: "long",
-                    year: "numeric",
-                  })}
-                </div>
-                <button onClick={() => navigateMonth("next")} className="nav-button" title="Next Month">
-                  <ChevronRight size={12} />
-                </button>
-                <button onClick={() => navigateYear("next")} className="nav-button" title="Next Year">
+                {pickerView === "calendar" && (
+                  <button 
+                    onClick={() => navigateMonth("next")} 
+                    className="nav-button" 
+                    title="Next Month"
+                  >
+                    <ChevronRight size={12} />
+                  </button>
+                )}
+                <button 
+                  onClick={() => pickerView === "year" ? navigateYearInYearView("next") : navigateYear("next")} 
+                  className="nav-button" 
+                  title={pickerView === "year" ? "Next Years" : "Next Year"}
+                >
                   <ChevronRight size={14} />
                 </button>
               </div>
             </div>
 
-            {quickDateOptions.length > 0 && (
-              <div className="quick-dates">
-                {quickDateOptions.map((option, index) => (
-                  <button
-                    key={index}
-                    type="button"
-                    className="quick-date-button"
-                    onClick={() => handleQuickDateSelect(option.value)}
-                  >
-                    {option.label}
-                  </button>
-                ))}
-              </div>
-            )}
+            {pickerView === "calendar" && renderCalendarView()}
+            {pickerView === "month" && renderMonthView()}
+            {pickerView === "year" && renderYearView()}
 
-            <div className="calendar-grid">
-              <div className="calendar-header">
-                {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day, index) => (
-                  <div key={index} className="day-header">
-                    {day}
-                  </div>
-                ))}
-              </div>
-              <div className="calendar-body">
-                {generateCalendarDays().map((date, index) => (
-                  <button
-                    key={index}
-                    type="button"
-                    className={getDayClasses(date)}
-                    onClick={() => handleDateSelect(date)}
-                    disabled={isDateDisabled(date)}
-                  >
-                    {date.getDate()}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {showTime && (
+            {showTime && pickerView === "calendar" && (
               <div className="time-picker">
                 <div className="time-picker-header">
                   <Clock size={16} />

@@ -8,7 +8,10 @@ const DropdownShowcase = () => {
   const [searchableSingle, setSearchableSingle] = useState("");
   const [searchableSingleinline, setSearchableSingleInline] = useState("");
   const [searchableMulti, setSearchableMulti] = useState<string[]>([]);
-//   const [internalSingle, setInternalSingle] = useState("");
+  const [searchableBoth, setSearchableBoth] = useState<string[]>([]);
+  const [searchableLeft, setSearchableLeft] = useState<string[]>([]);
+  const [searchableRight, setSearchableRight] = useState<string[]>([]);
+  // const [internalSingle, setInternalSingle] = useState("");
   const [middleSingle, setMiddleSingle] = useState("");
   const [errorValue, setErrorValue] = useState("");
   const [selectedHeader,setSelectedHeader]=useState("");
@@ -60,6 +63,57 @@ const DropdownShowcase = () => {
     icon: <MapPin size={16} />
   }
 ];
+const transactionalOptions = [
+    {
+      value: '911110002',
+      label: '911110002',
+      leftSideContent: '911110002',
+      rightSideContent: 'Operator X | Circle North | shared'
+    },
+    {
+      value: '911110008', 
+      label: '911110008',
+      leftSideContent: '911110008',
+      rightSideContent: 'Operator Y | Circle South | private'
+    },
+    {
+      value: '911110015',
+      label: '911110015', 
+      leftSideContent: '911110015',
+      rightSideContent: 'Operator Z | Circle East | shared'
+    }
+  ];
+
+  const userOptions = [
+    {
+      value: 'john_doe',
+      label: 'John Doe',
+      rightSideContent: 'Admin'
+    },
+    {
+      value: 'jane_smith',
+      label: 'Jane Smith', 
+      rightSideContent: 'Manager'
+    },
+    {
+      value: 'bob_wilson',
+      label: 'Bob Wilson',
+      rightSideContent: 'Developer'
+    }
+  ];
+
+  const productOptions = [
+    {
+      value: 'prod1',
+      label: 'Product 1',
+      leftSideContent: 'SKU-001 | Product 1'
+    },
+    {
+      value: 'prod2', 
+      label: 'Product 2',
+      leftSideContent: 'SKU-002 | Product 2'
+    }
+  ];
 
   const skillOptions = [
     { value: "js", label: "JavaScript" },
@@ -126,6 +180,7 @@ const DropdownShowcase = () => {
         />
       </div>
 
+
       <div className="form-group">
         <h3>Searchable Single Select - left inline label</h3>
         <Dropdown
@@ -166,6 +221,57 @@ const DropdownShowcase = () => {
           multiSelect
           searchable
           infoTip="Type to search and select multiple skills"
+        />
+      </div>
+
+      <div className="form-group">
+        <h3>Searchable both side content</h3>
+        <Dropdown
+          label="Skills"
+          labelPosition="internal"
+          placeholder="Search and select skills"
+          options={transactionalOptions}
+          value={searchableBoth}
+          onChange={(value) => setSearchableBoth(value as string[])}
+          multiSelect
+          searchable
+          infoTip="Type to search and select multiple skills"
+          showSideContent
+          sideContentPosition="both"
+        />
+      </div>
+
+      <div className="form-group">
+        <h3>Searchable right side content</h3>
+        <Dropdown
+          label="Skills"
+          labelPosition="internal"
+          placeholder="Search and select skills"
+          options={userOptions}
+          value={searchableRight}
+          onChange={(value) => setSearchableRight(value as string[])}
+          multiSelect
+          searchable
+          infoTip="Type to search and select multiple skills"
+          showSideContent
+          sideContentPosition="right"
+        />
+      </div>
+
+      <div className="form-group">
+        <h3>Searchable left side content</h3>
+        <Dropdown
+          label="Skills"
+          labelPosition="internal"
+          placeholder="Search and select skills"
+          options={productOptions}
+          value={searchableLeft}
+          onChange={(value) => setSearchableLeft(value as string[])}
+          multiSelect
+          searchable
+          infoTip="Type to search and select multiple skills"
+          showSideContent
+          sideContentPosition="left"
         />
       </div>
 
