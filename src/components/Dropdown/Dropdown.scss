@@ -439,28 +439,28 @@
     font-size: 13px;
     outline: none;
 
-    &:focus {
-      border-color: $primary-color;
-      box-shadow: 0 0 0 2px rgba(90, 79, 255, 0.1);
-    }
+    // &:focus {
+    //   border-color: $primary-color;
+    //   box-shadow: 0 0 0 2px rgba(90, 79, 255, 0.1);
+    // }
   }
 }
     .dropdown-search {
       padding: 6px;
-      border-bottom: 1px solid #eee;
+          border-bottom: 2px solid #c6bebe;
 
       .search-input {
         width: 100%;
         padding: 7px 10px;
         border: 1px solid #ddd;
-        border-radius: 2px;
+        border-radius: 4px;
         font-size: 13px;
         outline: none;
         box-sizing: border-box;
 
         &:focus {
-          border-color: $primary-color;
-          box-shadow: 0 0 0 2px rgba(90, 79, 255, 0.1);
+          // border-color: $primary-color;
+          // box-shadow: 0 0 0 2px rgba(90, 79, 255, 0.1);
         }
       }
     }

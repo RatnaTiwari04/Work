@@ -45,7 +45,7 @@ interface DropdownProps {
 const Dropdown: React.FC<DropdownProps> = ({
   label,
   labelPosition = "external",
-  placeholder = "Select an option",
+  placeholder,
   required = false,
   disabled = false,
   readOnly = false,
@@ -81,6 +81,23 @@ const Dropdown: React.FC<DropdownProps> = ({
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const customInputRef = useRef<HTMLInputElement>(null);
+
+  // Get the effective placeholder - use provided placeholder or first option's label
+  const getEffectivePlaceholder = () => {
+    if (placeholder !== undefined) {
+      return placeholder;
+    }
+    
+    // If no placeholder is provided, use the first option's label as default
+    if (options.length > 0) {
+      return options[0].label;
+    }
+    
+    // Fallback if no options are available
+    return "Select an option";
+  };
+
+  const effectivePlaceholder = getEffectivePlaceholder();
 
   useEffect(() => {
     if (multiSelect) {
@@ -461,8 +478,8 @@ const Dropdown: React.FC<DropdownProps> = ({
                   onBlur={() => setFocused(false)}
                   placeholder={
                     shouldShowLeftInlineLabel 
-                      ? (label ? `${label}: ` : placeholder)
-                      : (labelPosition === "internal" || labelPosition === "middle" ? "" : placeholder)
+                      ? (label ? `${label}: ` : effectivePlaceholder)
+                      : (labelPosition === "internal" || labelPosition === "middle" ? "" : effectivePlaceholder)
                   }
                   disabled={disabled}
                   readOnly={readOnly}
@@ -474,7 +491,7 @@ const Dropdown: React.FC<DropdownProps> = ({
                     <span className="dropdown-placeholder">
                       {labelPosition === "internal" || labelPosition === "middle" 
                         ? "" 
-                        : placeholder}
+                        : effectivePlaceholder}
                     </span>
                   )}
                   {((!multiSelect && hasValue) || shouldShowLeftInlineLabel) && (

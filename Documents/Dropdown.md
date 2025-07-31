@@ -11,6 +11,9 @@ This is a fully customizable and reusable **React + TypeScript** dropdown compon
 - Chip-based display for multi-select with expansion/collapse
 - Clear button functionality
 - Customizable maximum height and chip display limits
+- **Icons and side content support for enhanced option display**
+- **Radio buttons and checkboxes for visual selection indicators**
+- **Automatic placeholder fallback to first option when none provided**
 
 **Component Location:**
 ```
@@ -25,7 +28,7 @@ This is a fully customizable and reusable **React + TypeScript** dropdown compon
 |--------------------|--------------------------------------------------------|---------------------------------------------------- |--------|
 | `label`            | `string`                                               | Text label for the dropdown                         | -       |
 | `labelPosition`    | `"internal" \| "external" \| "middle" \| "left-inline"`| Position of the label                               | `"external"` |
-| `placeholder`      | `string`                                               | Placeholder text                                    | `"Select an option"` |
+| `placeholder`      | `string`                                               | Placeholder text (if not provided, uses first option's label) | Auto-generated from first option |
 | `required`         | `boolean`                                              | Marks the field as required                         | `false` |
 | `disabled`         | `boolean`                                              | Disables dropdown field                             | `false` |
 | `readOnly`         | `boolean`                                              | Makes dropdown read-only (prevents interaction)     | `false` |
@@ -44,6 +47,10 @@ This is a fully customizable and reusable **React + TypeScript** dropdown compon
 | `showClearButton`  | `boolean`                                              | Shows clear button when value exists                | `true` |
 | `maxChipsToShow`   | `number`                                               | Maximum chips to display before "more"              | `3` |
 | `showLabelWithValue` | `boolean`                                            | Shows label with value (backward compatibility)     |`false` |
+| `showRadioButtons` | `boolean`                                              | Shows radio buttons for single select options       | `true` |
+| `showIcons`        | `boolean`                                              | Shows icons in options when available               | `true` |
+| `showSideContent`  | `boolean`                                              | Enables side content display in options             | `false` |
+| `sideContentPosition` | `"left" \| "right" \| "both"`                       | Position of side content in options                 | `"right"` |
 
 ---
 
@@ -55,6 +62,9 @@ interface DropdownOption {
   value: string;
   label: string;
   disabled?: boolean;
+  icon?: React.ReactNode;           // New: Icon support
+  leftSideContent?: string;         // New: Left side content
+  rightSideContent?: string;        // New: Right side content
 }
 ```
 
@@ -89,6 +99,39 @@ const [showAllChips, setShowAllChips] = useState(false);
 - `singleValue`: Single selected value for single-select mode
 - `customInputValue`: Custom input text when `allowCustomInput` is enabled
 - `showAllChips`: Controls chip expansion/collapse in multi-select
+
+### Placeholder Logic (New Feature)
+```ts
+const getEffectivePlaceholder = () => {
+  if (placeholder !== undefined) {
+    return placeholder;
+  }
+  
+  // If no placeholder is provided, use the first option's label as default
+  if (options.length > 0) {
+    return options[0].label;
+  }
+  
+  // Fallback if no options are available
+  return "Select an option";
+};
+```
+
+**Automatic Placeholder Behavior:**
+- If `placeholder` prop is provided (including empty string), uses that value
+- If `placeholder` is undefined and options exist, uses first option's label
+- Falls back to "Select an option" if no options are available
+
+### Enhanced Search Functionality
+The search now filters across multiple fields:
+```ts
+const filteredOptions = options.filter(option =>
+  option.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  option.value.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  (option.leftSideContent && option.leftSideContent.toLowerCase().includes(searchTerm.toLowerCase())) ||
+  (option.rightSideContent && option.rightSideContent.toLowerCase().includes(searchTerm.toLowerCase()))
+);
+```
 
 ### Key Handlers
 
@@ -155,7 +198,7 @@ const handleClear = (e: React.MouseEvent) => {
 ```tsx
 <div className={containerClass} ref={dropdownRef}>
 ```
-Contains all elements with dynamic classes based on `labelPosition`, `variant`, `readOnly`, and state
+Contains all elements with dynamic classes based on `labelPosition`, `variant`, `readOnly`, `showSideContent`, and state
 
 ### Labels
 
@@ -220,10 +263,51 @@ The `left-inline` position displays the label inline with the selected value:
   <div className="dropdown-icons">...</div>
 </div>
 ```
-- Displays current value(s) or placeholder
+- Displays current value(s) or automatic placeholder
 - Includes clear button and chevron icons
 - Supports custom input mode
 - Respects `readOnly` state
+- Shows side content when enabled
+
+### Enhanced Option Display (New Feature)
+```tsx
+<div className="dropdown-option">
+  {/* Radio button or checkbox */}
+  {multiSelect ? (
+    <div className="checkbox">
+      <input type="checkbox" checked={isSelected} />
+    </div>
+  ) : (
+    showRadioButtons && (
+      <div className="radio">
+        <input type="radio" checked={isSelected} />
+      </div>
+    )
+  )}
+  
+  {/* Option icon */}
+  {showIcons && option.icon && (
+    <div className="option-icon">
+      {option.icon}
+    </div>
+  )}
+  
+  {/* Side content or label */}
+  {showSideContent ? (
+    <div className="option-content-wrapper">
+      {sideContentPosition === "left" && option.leftSideContent && (
+        <span className="option-left-content">{option.leftSideContent}</span>
+      )}
+      <span className="option-label">{option.label}</span>
+      {sideContentPosition === "right" && option.rightSideContent && (
+        <span className="option-right-content">{option.rightSideContent}</span>
+      )}
+    </div>
+  ) : (
+    <span className="option-label">{option.label}</span>
+  )}
+</div>
+```
 
 ### Dropdown Menu
 ```tsx
@@ -236,7 +320,7 @@ The `left-inline` position displays the label inline with the selected value:
 ```
 - Conditionally rendered based on `isOpen` state and `readOnly` prop
 - Includes search input when `searchable` is true
-- Contains filtered options list
+- Contains filtered options list with enhanced display options
 
 ### Multi-Select Chips
 ```tsx
@@ -281,20 +365,44 @@ Displays contextual messages after user interaction
 3. **Middle**: Label centered in field, moves up when focused
 4. **Left-Inline**: Label appears inline with the selected value (`"Label: Value"`)
 
+### Automatic Placeholder (New Feature)
+- **Smart Fallback**: When no placeholder is provided, automatically uses the first option's label
+- **Explicit Control**: Pass `placeholder=""` for empty placeholder or any string for custom placeholder
+- **Consistent Behavior**: Works across all label positions and input modes
+
+### Enhanced Option Display (New Features)
+
+#### Icons Support
+- Display custom React icons alongside option labels
+- Controlled via `showIcons` prop (default: true)
+- Icons integrate seamlessly with all other features
+
+#### Side Content Support
+- **Left Side Content**: Additional content on the left side of options
+- **Right Side Content**: Additional context on the right side of options
+- **Both Sides**: Support for content on both left and right
+- **Searchable**: Side content is included in search filtering
+- **Position Control**: `sideContentPosition` prop controls layout
+
+#### Visual Selection Indicators
+- **Radio Buttons**: For single-select options (controlled via `showRadioButtons`)
+- **Checkboxes**: Automatically shown for multi-select options
+- **Clean Integration**: Works with icons and side content
+
 ### Search Functionality
-- Filters options by both label and value
+- Filters options by label, value, and both left and right side content
 - Auto-focuses search input when dropdown opens
 - Real-time filtering as user types
-- Case-insensitive matching
+- Case-insensitive matching across all searchable fields
 
 ### Custom Input Support
 - Allows users to enter custom values
 - Supports Enter key to add custom options
 - Integrates with existing option selection
-- Works with left-inline labels
+- Works with left-inline labels and automatic placeholder
 
 ### Multi-Select Capabilities
-- Checkbox-style selection
+- Checkbox-style selection with visual indicators
 - Chip-based value display with reverse order (newest first)
 - Expandable/collapsible chip container
 - Individual chip removal
@@ -325,33 +433,90 @@ Displays contextual messages after user interaction
 - Focus management for search input and custom input modes
 - Proper color contrast for validation states
 - Semantic HTML structure with appropriate roles
+- Radio buttons and checkboxes include proper titles and labels
 
 ---
 
 ## Usage Examples
 
-### Basic Single Select
+### Basic Single Select with Auto Placeholder
 ```tsx
+// Will automatically use "United States" as placeholder (first option)
 <Dropdown
   label="Country"
   name="country"
-  options={countryOptions}
+  options={[
+    { value: "us", label: "United States" },
+    { value: "ca", label: "Canada" },
+    { value: "uk", label: "United Kingdom" }
+  ]}
   value={selectedCountry}
   onChange={setSelectedCountry}
 />
 ```
 
-### Multi-Select with Search
+### Multi-Select with Icons
 ```tsx
 <Dropdown
-  label="Skills"
-  name="skills"
-  options={skillOptions}
+  label="File Type"
+  name="fileType"
+  options={[
+    { value: "text", label: "Text", icon: <FileText size={16} /> },
+    { value: "image", label: "Image", icon: <Image size={16} /> },
+    { value: "video", label: "Video", icon: <Video size={16} /> }
+  ]}
+  multiSelect
+  showIcons={true}
+  showRadioButtons={true}
+  value={selectedTypes}
+  onChange={setSelectedTypes}
+/>
+```
+
+### Side Content Support
+```tsx
+<Dropdown
+  label="User Selection"
+  name="users"
+  options={[
+    {
+      value: "john_doe",
+      label: "John Doe",
+      rightSideContent: "Admin"
+    },
+    {
+      value: "jane_smith", 
+      label: "Jane Smith",
+      rightSideContent: "Manager"
+    }
+  ]}
+  showSideContent={true}
+  sideContentPosition="right"
+  searchable
+  value={selectedUser}
+  onChange={setSelectedUser}
+/>
+```
+
+### Both Side Content
+```tsx
+<Dropdown
+  label="Transaction IDs"
+  name="transactions"
+  options={[
+    {
+      value: "911110002",
+      label: "911110002",
+      leftSideContent: "911110002",
+      rightSideContent: "Operator X | Circle North | shared"
+    }
+  ]}
+  showSideContent={true}
+  sideContentPosition="both"
   multiSelect
   searchable
-  value={selectedSkills}
-  onChange={setSelectedSkills}
-  maxChipsToShow={2}
+  value={selectedTransactions}
+  onChange={setSelectedTransactions}
 />
 ```
 
@@ -365,29 +530,54 @@ Displays contextual messages after user interaction
   allowCustomInput
   value={customValue}
   onChange={setCustomValue}
+  // No placeholder provided - will use first option's label
 />
 ```
 
-### Read-Only State
+### Explicit Empty Placeholder
+```tsx
+<Dropdown
+  label="Country"
+  name="country"
+  placeholder=""  // Explicitly empty placeholder
+  options={countryOptions}
+  value={selectedCountry}
+  onChange={setSelectedCountry}
+/>
+```
+
+### Read-Only State with Side Content
 ```tsx
 <Dropdown
   label="Status"
   name="status"
-  options={statusOptions}
+  options={[
+    {
+      value: "active",
+      label: "Active",
+      icon: <CheckCircle size={16} />,
+      rightSideContent: "Online"
+    }
+  ]}
   value={currentStatus}
+  showSideContent={true}
+  showIcons={true}
   readOnly
 />
 ```
 
-### With Validation
+### With Validation and Enhanced Features
 ```tsx
 <Dropdown
   label="Required Field"
   name="required"
-  options={options}
+  options={optionsWithIcons}
   required
   variant="error"
   message="This field is required"
+  showIcons={true}
+  showRadioButtons={true}
+  searchable
   value={value}
   onChange={setValue}
 />
@@ -403,5 +593,19 @@ The component uses SCSS modules with the following main classes:
 - `.dropdown-menu` - Dropdown options container
 - `.chip-container` - Multi-select chips wrapper
 - `.message` - Validation message with variant styling
+- `.option-icon` - Icon styling in options (new)
+- `.option-left-content` - Left side content styling (new)
+- `.option-right-content` - Right side content styling (new)
+- `.side-content-display` - Main field side content display (new)
+- `.with-side-content` - Container modifier for side content (new)
 
 State-specific classes are automatically applied based on component state and props.
+
+### New CSS Classes for Enhanced Features
+- `.option-content-wrapper` - Wrapper for options with side content
+- `.radio` - Radio button container styling
+- `.checkbox` - Checkbox container styling
+- `.option-icon` - Icon display in options
+- `.side-content-display` - Side content in main field display
+
+The component maintains full backward compatibility while adding these enhanced display options.
