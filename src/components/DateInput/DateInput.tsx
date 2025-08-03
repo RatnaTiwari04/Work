@@ -34,11 +34,13 @@ interface DateInputProps {
   firstDayOfWeek?: 0 | 1;
   yearRange?: [number, number];
   quickDateOptions?: { label: string; value: string }[];
-  // New time-related props
+  // Time-related props
   showTime?: boolean;
   timeFormat?: TimeFormat;
   minuteStep?: number;
-  defaultTime?: string; // Format: "HH:mm" or "HH:mm AM/PM"
+  secondStep?: number; // New prop for seconds step
+  showSeconds?: boolean; // New prop to enable/disable seconds
+  defaultTime?: string; // Format: "HH:mm:ss" or "HH:mm:ss AM/PM"
 }
 
 const DateInput: React.FC<DateInputProps> = ({
@@ -66,11 +68,13 @@ const DateInput: React.FC<DateInputProps> = ({
   enabledDatesOnly = [],
   yearRange,
   quickDateOptions = [],
-  // New time-related props
+  // Time-related props
   showTime = false,
   timeFormat = "12",
   minuteStep = 1,
-  defaultTime = "12:00 AM",
+  secondStep = 1, // New prop with default
+  showSeconds = true, // New prop with default
+  defaultTime = "12:00:00 AM",
 }) => {
   const [focused, setFocused] = useState(false);
   const [touched, setTouched] = useState(false);
@@ -81,9 +85,10 @@ const DateInput: React.FC<DateInputProps> = ({
   const [inputError, setInputError] = useState("");
   const [pickerView, setPickerView] = useState<PickerView>("calendar");
   
-  // Time-related state
+  // Time-related state (now includes seconds)
   const [selectedHour, setSelectedHour] = useState(12);
   const [selectedMinute, setSelectedMinute] = useState(0);
+  const [selectedSecond, setSelectedSecond] = useState(0); // New seconds state
   const [selectedPeriod, setSelectedPeriod] = useState<"AM" | "PM">("AM");
 
   const dateInputRef = useRef<HTMLInputElement>(null);
@@ -132,18 +137,38 @@ const DateInput: React.FC<DateInputProps> = ({
   const getPlaceholder = () => {
     if (placeholder) return placeholder;
     if (showTime) {
-      const timeFormat12 = timeFormat === "12" ? " hh:mm AM/PM" : " HH:mm";
+      const secondsPart = showSeconds ? ":ss" : "";
+      const timeFormat12 = timeFormat === "12" ? ` hh:mm${secondsPart} AM/PM` : ` HH:mm${secondsPart}`;
       return dateFormat.toLowerCase() + timeFormat12;
     }
     return dateFormat.toLowerCase();
   };
 
   const parseTimeString = (timeStr: string) => {
-    const timeRegex12 = /^(\d{1,2}):(\d{2})\s*(AM|PM)$/i;
-    const timeRegex24 = /^(\d{1,2}):(\d{2})$/;
+    // Updated regex patterns to handle seconds
+    const timeRegex12WithSeconds = /^(\d{1,2}):(\d{2}):(\d{2})\s*(AM|PM)$/i;
+    const timeRegex12WithoutSeconds = /^(\d{1,2}):(\d{2})\s*(AM|PM)$/i;
+    const timeRegex24WithSeconds = /^(\d{1,2}):(\d{2}):(\d{2})$/;
+    const timeRegex24WithoutSeconds = /^(\d{1,2}):(\d{2})$/;
     
     if (timeFormat === "12") {
-      const match = timeStr.match(timeRegex12);
+      // Try with seconds first
+      let match = timeStr.match(timeRegex12WithSeconds);
+      if (match) {
+        const hour = parseInt(match[1], 10);
+        const minute = parseInt(match[2], 10);
+        const second = parseInt(match[3], 10);
+        const period = match[4].toUpperCase() as "AM" | "PM";
+        
+        setSelectedHour(hour);
+        setSelectedMinute(minute);
+        setSelectedSecond(second);
+        setSelectedPeriod(period);
+        return;
+      }
+      
+      // Try without seconds
+      match = timeStr.match(timeRegex12WithoutSeconds);
       if (match) {
         const hour = parseInt(match[1], 10);
         const minute = parseInt(match[2], 10);
@@ -151,16 +176,32 @@ const DateInput: React.FC<DateInputProps> = ({
         
         setSelectedHour(hour);
         setSelectedMinute(minute);
+        setSelectedSecond(0); // Default to 0 seconds
         setSelectedPeriod(period);
       }
     } else {
-      const match = timeStr.match(timeRegex24);
+      // Try with seconds first
+      let match = timeStr.match(timeRegex24WithSeconds);
+      if (match) {
+        const hour = parseInt(match[1], 10);
+        const minute = parseInt(match[2], 10);
+        const second = parseInt(match[3], 10);
+        
+        setSelectedHour(hour);
+        setSelectedMinute(minute);
+        setSelectedSecond(second);
+        return;
+      }
+      
+      // Try without seconds
+      match = timeStr.match(timeRegex24WithoutSeconds);
       if (match) {
         const hour = parseInt(match[1], 10);
         const minute = parseInt(match[2], 10);
         
         setSelectedHour(hour);
         setSelectedMinute(minute);
+        setSelectedSecond(0); // Default to 0 seconds
       }
     }
   };
@@ -184,9 +225,25 @@ const DateInput: React.FC<DateInputProps> = ({
   const formatTime = (): string => {
     if (timeFormat === "12") {
       const displayHour = selectedHour === 0 ? 12 : selectedHour;
-      return `${displayHour.toString().padStart(2, '0')}:${selectedMinute.toString().padStart(2, '0')} ${selectedPeriod}`;
+      const hourStr = displayHour.toString().padStart(2, '0');
+      const minuteStr = selectedMinute.toString().padStart(2, '0');
+      const secondStr = selectedSecond.toString().padStart(2, '0');
+      
+      if (showSeconds) {
+        return `${hourStr}:${minuteStr}:${secondStr} ${selectedPeriod}`;
+      } else {
+        return `${hourStr}:${minuteStr} ${selectedPeriod}`;
+      }
     } else {
-      return `${selectedHour.toString().padStart(2, '0')}:${selectedMinute.toString().padStart(2, '0')}`;
+      const hourStr = selectedHour.toString().padStart(2, '0');
+      const minuteStr = selectedMinute.toString().padStart(2, '0');
+      const secondStr = selectedSecond.toString().padStart(2, '0');
+      
+      if (showSeconds) {
+        return `${hourStr}:${minuteStr}:${secondStr}`;
+      } else {
+        return `${hourStr}:${minuteStr}`;
+      }
     }
   };
 
@@ -377,6 +434,12 @@ const DateInput: React.FC<DateInputProps> = ({
     setTimeout(handleTimeChange, 0);
   };
 
+  // New handler for seconds
+  const handleSecondChange = (second: number) => {
+    setSelectedSecond(second);
+    setTimeout(handleTimeChange, 0);
+  };
+
   const handlePeriodChange = (period: "AM" | "PM") => {
     setSelectedPeriod(period);
     setTimeout(handleTimeChange, 0);
@@ -497,6 +560,15 @@ const DateInput: React.FC<DateInputProps> = ({
     return minutes;
   };
 
+  // New function to generate seconds
+  const generateSeconds = () => {
+    const seconds = [];
+    for (let i = 0; i < 60; i += secondStep) {
+      seconds.push(i);
+    }
+    return seconds;
+  };
+
   const getDayClasses = (date: Date): string => {
     const classes = ["calendar-day"];
     const today = new Date();
@@ -532,6 +604,7 @@ const DateInput: React.FC<DateInputProps> = ({
     variant,
     inputError ? "error" : "",
     showTime ? "with-time" : "",
+    showSeconds ? "with-seconds" : "", // New class for seconds styling
   ]
     .filter(Boolean)
     .join(" ");
@@ -786,6 +859,27 @@ const DateInput: React.FC<DateInputProps> = ({
                       ))}
                     </select>
                   </div>
+
+                  {/* New seconds control */}
+                  {showSeconds && (
+                    <>
+                      <div className="time-separator">:</div>
+                      <div className="time-control">
+                        <label>Second</label>
+                        <select
+                          value={selectedSecond}
+                          onChange={(e) => handleSecondChange(Number(e.target.value))}
+                          className="time-select"
+                        >
+                          {generateSeconds().map((second) => (
+                            <option key={second} value={second}>
+                              {second.toString().padStart(2, '0')}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </>
+                  )}
 
                   {timeFormat === "12" && (
                     <>
