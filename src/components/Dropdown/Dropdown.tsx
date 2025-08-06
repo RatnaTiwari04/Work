@@ -40,6 +40,10 @@ interface DropdownProps {
   showIcons?: boolean;
   showSideContent?: boolean;
   sideContentPosition?: "left" | "right" | "both";
+  // New props for primary selection
+  allowPrimarySelection?: boolean;
+  primaryValue?: string;
+  onPrimaryChange?: (value: string) => void;
 }
 
 const Dropdown: React.FC<DropdownProps> = ({
@@ -68,6 +72,10 @@ const Dropdown: React.FC<DropdownProps> = ({
   showIcons = true,
   showSideContent = false,
   sideContentPosition = "right",
+  // New props for primary selection
+  allowPrimarySelection = false,
+  primaryValue = "",
+  onPrimaryChange,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [focused, setFocused] = useState(false);
@@ -77,6 +85,7 @@ const Dropdown: React.FC<DropdownProps> = ({
   const [singleValue, setSingleValue] = useState<string>("");
   const [customInputValue, setCustomInputValue] = useState<string>("");
   const [showAllChips, setShowAllChips] = useState(false);
+  const [internalPrimaryValue, setInternalPrimaryValue] = useState<string>("");
   
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -98,6 +107,9 @@ const Dropdown: React.FC<DropdownProps> = ({
   };
 
   const effectivePlaceholder = getEffectivePlaceholder();
+
+  // Handle primary value (controlled vs uncontrolled)
+  const currentPrimaryValue = primaryValue !== undefined ? primaryValue : internalPrimaryValue;
 
   useEffect(() => {
     if (multiSelect) {
@@ -244,6 +256,11 @@ const Dropdown: React.FC<DropdownProps> = ({
         : [...selectedValues, optionValue];
       setSelectedValues(newValues);
       onChange?.(newValues);
+
+      // If removing an option and it was the primary, clear primary
+      if (allowPrimarySelection && !newValues.includes(optionValue) && currentPrimaryValue === optionValue) {
+        handlePrimaryChange("");
+      }
     } else {
       setSingleValue(optionValue);
       if (allowCustomInput) {
@@ -256,6 +273,16 @@ const Dropdown: React.FC<DropdownProps> = ({
     }
   };
 
+  const handlePrimaryChange = (value: string) => {
+    if (readOnly) return;
+    
+    if (onPrimaryChange) {
+      onPrimaryChange(value);
+    } else {
+      setInternalPrimaryValue(value);
+    }
+  };
+
   const handleClear = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (readOnly) return;
@@ -263,6 +290,10 @@ const Dropdown: React.FC<DropdownProps> = ({
     if (multiSelect) {
       setSelectedValues([]);
       onChange?.([]);
+      // Clear primary selection when clearing all
+      if (allowPrimarySelection) {
+        handlePrimaryChange("");
+      }
     } else {
       setSingleValue("");
       if (allowCustomInput) {
@@ -278,6 +309,11 @@ const Dropdown: React.FC<DropdownProps> = ({
     const newValues = selectedValues.filter(val => val !== valueToRemove);
     setSelectedValues(newValues);
     onChange?.(newValues);
+
+    // If removing the primary chip, clear primary selection
+    if (allowPrimarySelection && currentPrimaryValue === valueToRemove) {
+      handlePrimaryChange("");
+    }
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -342,6 +378,7 @@ const Dropdown: React.FC<DropdownProps> = ({
     readOnly ? "readonly" : "",
     showLabelWithValue ? "label-with-value" : "",
     showSideContent ? "with-side-content" : "",
+    allowPrimarySelection ? "with-primary-selection" : "",
   ].filter(Boolean).join(" ");
 
   const dropdownClass = ["dropdown", inputState, className].join(" ");
@@ -372,8 +409,9 @@ const Dropdown: React.FC<DropdownProps> = ({
       <div className="chip-container">
         {chipsToShow.map((value) => {
           const option = options.find(opt => opt.value === value);
+          const isPrimary = allowPrimarySelection && currentPrimaryValue === value;
           return (
-            <div className="chip" key={value}>
+            <div className={`chip ${isPrimary ? 'primary-chip' : ''}`} key={value}>
               {option?.label || value}
               {!readOnly && (
                 <button
@@ -573,6 +611,8 @@ const Dropdown: React.FC<DropdownProps> = ({
                         : singleValue === option.value ? "selected" : ""
                     } ${option.disabled ? "disabled" : ""} ${
                       showSideContent ? "with-side-content" : ""
+                    } ${
+                      allowPrimarySelection && multiSelect ? "with-primary-radio" : ""
                     }`}
                     onClick={() => !option.disabled && handleOptionClick(option.value)}
                     role="option"
@@ -628,6 +668,20 @@ const Dropdown: React.FC<DropdownProps> = ({
                       </div>
                     ) : (
                       <span className="option-label">{option.label}</span>
+                    )}
+
+                    {/* Primary selection radio button for multiselect */}
+                    {allowPrimarySelection && multiSelect && selectedValues.includes(option.value) && (
+                      <div className="primary-radio" onClick={(e) => e.stopPropagation()}>
+                        <input
+                          type="radio"
+                          name={`${name || 'dropdown'}-primary`}
+                          checked={currentPrimaryValue === option.value}
+                          onChange={() => handlePrimaryChange(option.value)}
+                          tabIndex={-1}
+                          title={`Set ${option.label} as primary`}
+                        />
+                      </div>
                     )}
                   </div>
                 ))

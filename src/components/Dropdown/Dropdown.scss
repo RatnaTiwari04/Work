@@ -1,5 +1,6 @@
 @use '../../styles/Colors' as *;
 @use 'sass:color';
+
 .dropdown-container {
   &.label-left-inline,
   &.label-with-value {
@@ -23,6 +24,7 @@
     }
   }
 }
+
 .dropdown-container {
   &.with-side-content {
     .dropdown-value {
@@ -39,9 +41,9 @@
           color: #333;
           flex: 1;
           text-align: left;
-          overflow: hidden;          // Add this
-          text-overflow: ellipsis;   // Add this
-          white-space: nowrap;       // Add this
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }
         
         .right-content {
@@ -51,16 +53,16 @@
           flex-shrink: 0;
           text-align: right;
           margin-left: 8px;
-          overflow: hidden;          // Add this
-          text-overflow: ellipsis;   // Add this
-          white-space: nowrap;       // Add this
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }
       }
     }
   }
+
   .dropdown-menu {
     .dropdown-option {
-      // Add this new section for side content in options
       &.with-side-content {
         .option-content-wrapper {
           display: flex;
@@ -103,7 +105,34 @@
         }
       }
 
-      // Add icon styling
+      // Primary radio button styling for multiselect options
+      &.with-primary-radio {
+        .primary-radio {
+          display: flex;
+          align-items: center;
+          margin-left: auto;
+          padding-left: 8px;
+
+          input[type="radio"] {
+            width: 14px;
+            height: 14px;
+            margin: 0;
+            cursor: pointer;
+            accent-color: #c52222; // Green color for primary selection
+            
+            &:focus {
+              // outline: 2px solid #22c55e;
+              outline-offset: 2px;
+            }
+            
+            &:disabled {
+              cursor: not-allowed;
+              opacity: 0.6;
+            }
+          }
+        }
+      }
+
       .option-icon {
         display: flex;
         align-items: center;
@@ -115,6 +144,7 @@
     }
   }
 }
+
 .dropdown-container {
   display: flex;
   flex-direction: column;
@@ -416,38 +446,34 @@
     margin-top: 10px;
     box-sizing: border-box;
 
-.dropdown-search {
-  position: relative;
-  padding: 8px;
-  border-bottom: 1px solid #eee;
-  
-  .search-icon {
-    position: absolute;
-    left: 16px; // Position from left edge of dropdown-search
-    top: 50%;
-    transform: translateY(-50%); // Center vertically
-    color: #999;
-    pointer-events: none;
-    z-index: 1;
-  }
-  
-  .search-input {
-    width: 100%;
-    padding: 6px 12px 6px 32px !important; // Increased left padding from 32px to 36px
-    border: 1px solid #ddd;
-    border-radius: 2px;
-    font-size: 13px;
-    outline: none;
+    .dropdown-search {
+      position: relative;
+      padding: 8px;
+      border-bottom: 1px solid #eee;
+      
+      .search-icon {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #999;
+        pointer-events: none;
+        z-index: 1;
+      }
+      
+      .search-input {
+        width: 100%;
+        padding: 6px 12px 6px 32px !important;
+        border: 1px solid #ddd;
+        border-radius: 2px;
+        font-size: 13px;
+        outline: none;
+      }
+    }
 
-    // &:focus {
-    //   border-color: $primary-color;
-    //   box-shadow: 0 0 0 2px rgba(90, 79, 255, 0.1);
-    // }
-  }
-}
     .dropdown-search {
       padding: 6px;
-          border-bottom: 2px solid #c6bebe;
+      border-bottom: 2px solid #c6bebe;
 
       .search-input {
         width: 100%;
@@ -457,11 +483,6 @@
         font-size: 13px;
         outline: none;
         box-sizing: border-box;
-
-        &:focus {
-          // border-color: $primary-color;
-          // box-shadow: 0 0 0 2px rgba(90, 79, 255, 0.1);
-        }
       }
     }
 
@@ -532,34 +553,6 @@
         }
       }
 
-      &:hover:not(.disabled) {
-        background: #f5f5f5;
-      }
-
-      &.selected {
-        background: #f5f5f5;
-        color: $primary-color;
-      }
-
-      &.disabled {
-        color: $disabled-color;
-        cursor: not-allowed;
-        opacity: 0.6;
-      }
-
-      .checkbox {
-        display: flex;
-        align-items: center;
-
-        input[type="checkbox"] {
-          width: 14px;
-          height: 14px;
-          margin: 0;
-          cursor: pointer;
-          accent-color: $primary-color;
-        }
-      }
-
       .option-label {
         flex: 1;
         white-space: nowrap;
@@ -607,8 +600,7 @@
     color: $error-color;
     pointer-events: none;
     z-index: 1;
-        padding-right: 26px;
-
+    padding-right: 26px;
     
     svg {
       display: block;
@@ -636,6 +628,24 @@
       border-radius: 8px;
       line-height: 1;
       height: 20px;
+      transition: all 0.2s ease;
+
+      // Primary chip styling
+      &.primary-chip {
+        background-color: #c52222; 
+        color: white;
+        border: 2px solid #a31616; 
+        font-weight: 600;
+        
+        button {
+          background-color: #c52222;
+          color: white;
+          
+          &:hover {
+            background-color: #dc2626; // Red on hover for remove button
+          }
+        }
+      }
 
       button {
         padding: 0;
@@ -650,23 +660,30 @@
         align-items: center;
         justify-content: center;
         outline: none;
+        transition: background-color 0.2s ease;
+
+        &:hover {
+          background-color: #dc2626; // Red on hover
+        }
       }
     }
-    .chip.more-chip{
-       background-color: white;
-    color: red;
+
+    .chip.more-chip {
+      background-color: white;
+      color: red;
+    }
+
+    .more-chip.clickable {
+      cursor: pointer;
+      
+      &:focus {
+        padding: 1px;
+        outline-offset: 1px;
       }
-      .more-chip.clickable {
-  cursor: pointer;
-//   transition: background-color 0.2s ease;
-  
-  &:focus {
-    padding: 1px;
-    outline-offset: 1px;
+    }
   }
 }
-  }
-}
+
 .dropdown-container {
   .dropdown-menu {
     position: absolute;
@@ -728,6 +745,7 @@
     }
   }
 }
+
 .form-showcase {
   width: 100%;
   max-width: 350px;
@@ -743,8 +761,6 @@
   }
 
   .form-group {
-    // margin-bottom: 2rem;
-    
     h3 {
       font-size: 14px;
       font-weight: 600;

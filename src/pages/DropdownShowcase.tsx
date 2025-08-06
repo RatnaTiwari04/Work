@@ -11,10 +11,15 @@ const DropdownShowcase = () => {
   const [searchableBoth, setSearchableBoth] = useState<string[]>([]);
   const [searchableLeft, setSearchableLeft] = useState<string[]>([]);
   const [searchableRight, setSearchableRight] = useState<string[]>([]);
-  // const [internalSingle, setInternalSingle] = useState("");
   const [middleSingle, setMiddleSingle] = useState("");
   const [errorValue, setErrorValue] = useState("");
-  const [selectedHeader,setSelectedHeader]=useState("");
+  const [selectedHeader, setSelectedHeader] = useState("");
+  
+  // New states for primary selection examples
+  const [multiWithPrimary, setMultiWithPrimary] = useState<string[]>(["js", "react", "ts"]);
+  const [primarySkill, setPrimarySkill] = useState<string>("react");
+  const [teamMembers, setTeamMembers] = useState<string[]>(["john_doe", "jane_smith"]);
+  const [primaryMember, setPrimaryMember] = useState<string>("john_doe");
 
   const countryOptions = [
     { value: "us", label: "United States" },
@@ -30,40 +35,38 @@ const DropdownShowcase = () => {
   ];
 
   const headerOptions = [
-  {
-    value: 'none',
-    label: 'None',
-    // No icon for this option
-    // disabled: true
-  },
-  {
-    value: 'text',
-    label: 'Text',
-    icon: <FileText size={16} />
-    
-  },
-  {
-    value: 'image',
-    label: 'Image',
-    icon: <Image size={16} />
-  },
-  {
-    value: 'video',
-    label: 'Video',
-    icon: <Video size={16} />
-  },
-  {
-    value: 'document',
-    label: 'Document',
-    icon: <FileDown size={16} />
-  },
-  {
-    value: 'location',
-    label: 'Location',
-    icon: <MapPin size={16} />
-  }
-];
-const transactionalOptions = [
+    {
+      value: 'none',
+      label: 'None',
+    },
+    {
+      value: 'text',
+      label: 'Text',
+      icon: <FileText size={16} />
+    },
+    {
+      value: 'image',
+      label: 'Image',
+      icon: <Image size={16} />
+    },
+    {
+      value: 'video',
+      label: 'Video',
+      icon: <Video size={16} />
+    },
+    {
+      value: 'document',
+      label: 'Document',
+      icon: <FileDown size={16} />
+    },
+    {
+      value: 'location',
+      label: 'Location',
+      icon: <MapPin size={16} />
+    }
+  ];
+
+  const transactionalOptions = [
     {
       value: '911110002',
       label: '911110002',
@@ -99,6 +102,11 @@ const transactionalOptions = [
       value: 'bob_wilson',
       label: 'Bob Wilson',
       rightSideContent: 'Developer'
+    },
+    {
+      value: 'alice_brown',
+      label: 'Alice Brown',
+      rightSideContent: 'Designer'
     }
   ];
 
@@ -137,8 +145,60 @@ const transactionalOptions = [
 
   return (
     <div className="form-showcase">
-      <h2>Dropdown Component</h2>
+      <h2>Dropdown Component with Primary Selection</h2>
 
+      {/* New Primary Selection Examples */}
+      <div className="form-group">
+        <h3>Multi Select with Primary Selection - Skills</h3>
+        <p style={{ fontSize: '12px', color: '#666', marginBottom: '8px' }}>
+          Select multiple skills and mark one as primary using the radio button on the right
+        </p>
+        <Dropdown
+          label="Skills"
+          labelPosition="external"
+          placeholder="Select your skills"
+          options={skillOptions}
+          value={multiWithPrimary}
+          onChange={(value) => setMultiWithPrimary(value as string[])}
+          multiSelect
+          allowPrimarySelection
+          primaryValue={primarySkill}
+          onPrimaryChange={setPrimarySkill}
+          searchable
+          infoTip="Select multiple skills and choose one as primary"
+        />
+        <div style={{ fontSize: '12px', color: '#666', marginTop: '8px' }}>
+          Primary skill: {primarySkill ? skillOptions.find(s => s.value === primarySkill)?.label || primarySkill : 'None'}
+        </div>
+      </div>
+
+      <div className="form-group">
+        <h3>Multi Select with Primary - Team Members</h3>
+        <p style={{ fontSize: '12px', color: '#666', marginBottom: '8px' }}>
+          Select team members and designate a team lead (primary)
+        </p>
+        <Dropdown
+          label="Team Members"
+          labelPosition="internal"
+          placeholder="Select team members"
+          options={userOptions}
+          value={teamMembers}
+          onChange={(value) => setTeamMembers(value as string[])}
+          multiSelect
+          allowPrimarySelection
+          primaryValue={primaryMember}
+          onPrimaryChange={setPrimaryMember}
+          showSideContent
+          sideContentPosition="right"
+          searchable
+          infoTip="Select team members and choose a team lead"
+        />
+        <div style={{ fontSize: '12px', color: '#666', marginTop: '8px' }}>
+          Team Lead: {primaryMember ? userOptions.find(u => u.value === primaryMember)?.label || primaryMember : 'None'}
+        </div>
+      </div>
+
+      {/* Original Examples */}
       <div className="form-group">
         <h3>Single Select - External Label</h3>
         <Dropdown
@@ -180,7 +240,6 @@ const transactionalOptions = [
         />
       </div>
 
-
       <div className="form-group">
         <h3>Searchable Single Select - left inline label</h3>
         <Dropdown
@@ -196,17 +255,17 @@ const transactionalOptions = [
         />
       </div>
 
-     <div className="form-group">
-       <h3>icons</h3>
-      <Dropdown
-       label="Header (Optional)"
-       placeholder="Select header type"
-       value={selectedHeader}
-       onChange={(value) => setSelectedHeader(value as string)}
-       options={headerOptions}
-       showRadioButtons={true}  // Show radio buttons
-       showIcons={true}        // Show icons
-      />
+      <div className="form-group">
+        <h3>Icons</h3>
+        <Dropdown
+          label="Header (Optional)"
+          placeholder="Select header type"
+          value={selectedHeader}
+          onChange={(value) => setSelectedHeader(value as string)}
+          options={headerOptions}
+          showRadioButtons={true}
+          showIcons={true}
+        />
       </div>
 
       <div className="form-group">
