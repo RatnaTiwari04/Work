@@ -3,7 +3,7 @@ Component Overview:
 This is a fully customizable and reusable **React + TypeScript** checkbox component supporting:
 - Single and multiple checkbox options
 - Required, disabled, and read-only states
-- Optional validation states with messages (error, warning, info, success) 
+- Optional validation states with messages (error, warning, info, success)
 - Inline and vertical layout options with auto-wrap functionality
 - Info tooltips for additional context
 - Accessibility features with proper labeling
